@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Centro de Monitoreo Durango</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="keywords" content="GEOMFU, SIG, mapas, geomática, Durango">
+    <meta name="description" content="CMMR - Plataforma de información geográfica">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Iconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bibliotecas originales -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet">
+
+    <!-- Bootstrap y estilos -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <!-- Estilo del mapa -->
+    <style>
+        #map {
+            width: 100%;
+            height: calc(100vh - 70px);
+            min-height: 450px;
+        }
+
+        .dropdown-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-fluid position-relative d-flex p-0">
+
+    <!-- Spinner -->
+    <div id="spinner"
+         class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary"
+             style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar pe-4 pb-3">
+
+        <nav class="navbar bg-secondary navbar-dark">
+
+            <a href="index.html" class="navbar-brand mx-4 mb-3">
+                <img src="img/CMMR_logo.png"
+                     alt="Logo institucional"
+                     class="logo">
+            </a>
+
+            <div class="navbar-nav w-100">
+
+                <!-- SERVICIOS -->
+                <div class="nav-item dropdown">
+
+                    <a href="#"
+                       class="nav-link dropdown-toggle active"
+                       data-bs-toggle="dropdown">
+
+                        <i class="fas fa-fire me-2"></i>
+                        Servicios
+                    </a>
+
+                    <div class="dropdown-menu bg-transparent border-0">
+
+                        <label class="dropdown-item">
+                            <input type="checkbox"
+                                   name="estaciones"
+                                   value="1"
+                                   onchange="mostrarServicios(this)">
+                            Estación 1
+                        </label>
+
+                        <label class="dropdown-item">
+                            <input type="checkbox"
+                                   name="estaciones"
+                                   value="2"
+                                   onchange="mostrarServicios(this)">
+                            Estación 2
+                        </label>
+
+                        <label class="dropdown-item">
+                            <input type="checkbox"
+                                   name="estaciones"
+                                   value="3"
+                                   onchange="mostrarServicios(this)">
+                            Estación 3
+                        </label>
+
+                        <label class="dropdown-item">
+                            <input type="checkbox"
+                                   name="estaciones"
+                                   value="4"
+                                   onchange="mostrarServicios(this)">
+                            Estación 4
+                        </label>
+
+                        <label class="dropdown-item">
+                            <input type="checkbox"
+                                   name="estaciones"
+                                   value="5"
+                                   onchange="mostrarServicios(this)">
+                            Estación 5
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- INFORMACIÓN GEOGRÁFICA -->
+                <div class="nav-item dropdown">
+
+                    <a href="#"
+                       class="nav-link dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <i class="fas fa-map me-2"></i>
+                        Información geográfica
+                    </a>
+
+                    <div class="dropdown-menu bg-transparent border-0">
+                        <a href="#" class="dropdown-item">Municipios</a>
+                        <a href="#" class="dropdown-item">Vegetación</a>
+                        <a href="#" class="dropdown-item">Áreas protegidas</a>
+                    </div>
+                </div>
+
+            </div>
+        </nav>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+
+            <a href="index.html"
+               class="navbar-brand d-flex d-lg-none me-4">
+                <h2 class="text-primary mb-0">
+                    <i class="fas fa-fire"></i>
+                </h2>
+            </a>
+
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+
+            <form class="d-none d-md-flex ms-4"
+                  onsubmit="return false;">
+
+                <input class="form-control bg-dark border-0"
+                       type="text"
+                       id="coordenadas"
+                       placeholder="Buscar coordenadas">
+            </form>
+
+            <div class="navbar-nav align-items-center ms-auto">
+
+                <div class="nav-item dropdown">
+
+                    <a href="#"
+                       class="nav-link dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <i class="fas fa-envelope me-2"></i>
+                        <span class="d-none d-lg-inline-flex">
+                            Contacto
+                        </span>
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+
+                        <a href="contacto.html" class="dropdown-item">
+                            <i class="fas fa-envelope me-2"></i>
+                            Contacto
+                        </a>
+
+                        <a href="acerca.html" class="dropdown-item">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Acerca de
+                        </a>
+
+                        <a href="ayuda.html" class="dropdown-item">
+                            <i class="fas fa-question-circle me-2"></i>
+                            Ayuda
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- MAPA -->
+        <div class="container-fluid">
+            <div class="row mx-0">
+                <div id="map"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Dependencias originales -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="lib/chart/chart.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/waypoints/waypoints.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="lib/tempusdominus/js/moment.min.js"></script>
+<script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- PapaParse -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<!-- Mapa y capas -->
+<script src="js/mapa.js"></script>
+<script src="js/coordenadas.js"></script>
+<script src="js/servicios.js"></script>
+
+<!-- Plantilla -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
