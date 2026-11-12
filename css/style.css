@@ -294,11 +294,6 @@
     object-fit: contain;
 }
 
-
-
-
-
-
 /* ======================================================
    VISOR CARTOGRÁFICO
    ====================================================== */
@@ -306,4 +301,118 @@
 #map {
     width: 100%;
     height: calc(100vh - 65px);
+}
+
+/* ==========================================
+   CMMR - POPUP SERVICIOS DE EMERGENCIA
+========================================== */
+
+/* Ventana Leaflet */
+.popup-cmmr .leaflet-popup-content-wrapper {
+    padding: 0 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+}
+
+/* Eliminar márgenes predeterminados */
+.popup-cmmr .leaflet-popup-content {
+    margin: 0 !important;
+    width: 340px !important;
+    max-width: calc(100vw - 60px);
+}
+
+/* Contenedor general */
+.popup-cmmr .popup-servicios {
+    width: 100%;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+/* Encabezado */
+.popup-cmmr .popup-encabezado {
+    background: #174a78;
+    color: #ffffff;
+    padding: 15px 25px 15px 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.4;
+}
+
+/* Área desplazable */
+.popup-cmmr .popup-contenido {
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Filas */
+.popup-cmmr .popup-fila {
+    padding: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Alternar colores */
+.popup-cmmr .popup-fila:nth-child(even) {
+    background: #f3f6fa;
+}
+
+/* Nombre del atributo */
+.popup-cmmr .popup-etiqueta {
+    display: block;
+    color: #174a78;
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+/* Valor del atributo */
+.popup-cmmr .popup-valor {
+    display: block;
+    color: #333333;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Barra de desplazamiento */
+.popup-cmmr .popup-contenido::-webkit-scrollbar {
+    width: 6px;
+}
+
+.popup-cmmr .popup-contenido::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 5px;
+}
+
+/* Botón cerrar */
+.popup-cmmr .leaflet-popup-close-button {
+    color: #ffffff !important;
+    font-size: 20px !important;
+    z-index: 10;
+}
+
+/* Aumentar ancho del popup */
+.popup-cmmr .leaflet-popup-content {
+    width: 600px !important;
+    max-width: calc(100vw - 60px) !important;
+    margin: 0 !important;
+}
+
+/* Ajustar contenedor */
+.popup-cmmr .popup-servicios {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ajustar contenido */
+.popup-cmmr .popup-contenido {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 15px;
+    box-sizing: border-box;
 }

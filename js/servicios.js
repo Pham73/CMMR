@@ -140,36 +140,108 @@ function dibujarEstacion(estacionSeleccionada) {
             fillOpacity: 0.85
         });
 
-        // POPUP CON TODOS LOS ATRIBUTOS
-        var popup = document.createElement("div");
+		// ==========================================
+		// POPUP CON ATRIBUTOS SELECCIONADOS
+		// ==========================================
 
-        Object.entries(fila).forEach(function(entrada) {
+		var camposMostrar = [
+			"FECHA",
+			"SUBCOMANDANTE",
+			"NO_ESTACION",
+			"ZONA",
+			"SERVICIOS_PRIORIDAD_UNO",
+			"SERVICIOS_PRIORIDAD_DOS",
+			"SERVICIOS_PRIORIDAD_TRES",
+			"SERVICIOS_PRIORIDAD_UNO_ZONARURAL",
+			"LUGAR",
+			"UNIDAD_PARTICIPAN",
+			"PERSONAL_OPERATIVO",
+			"ESTACION_QUE_APOYA",
+			"CORPORACIONES_PARTICIPAN",
+			"NARRATIVA_HECHOS"
+		];
 
-            var linea = document.createElement("div");
-            var etiqueta = document.createElement("strong");
+		// Crear contenedor principal
+		var popup = document.createElement("div");
+		popup.className = "popup-servicios";
 
-            etiqueta.textContent = entrada[0] + ": ";
+		// ==========================================
+		// ENCABEZADO
+		// ==========================================
 
-            linea.appendChild(etiqueta);
+		var encabezado = document.createElement("div");
+		encabezado.className = "popup-encabezado";
+		encabezado.textContent = "REPORTE DE SERVICIO DE EMERGENCIA";
 
-            linea.appendChild(
-                document.createTextNode(
-                    String(entrada[1] ?? "")
-                )
-            );
+		popup.appendChild(encabezado);
 
-            popup.appendChild(linea);
-        });
+		// ==========================================
+		// CONTENIDO
+		// ==========================================
 
-        marcador.bindPopup(popup);
-        marcador.addTo(capa);
+		var contenido = document.createElement("div");
+		contenido.className = "popup-contenido";
 
-        puntos.push([y, x]);
-    });
+		// Recorrer atributos seleccionados
+		camposMostrar.forEach(function(campo) {
 
-    console.log(
-        estacionSeleccionada + " - Puntos:", puntos.length
-    );
+			var valor = fila[campo];
+
+			// Omitir valores vacíos
+			if (
+				valor === undefined ||
+				valor === null ||
+				String(valor).trim() === ""
+			) return;
+
+			// Crear fila
+			var linea = document.createElement("div");
+			linea.className = "popup-fila";
+
+			// Crear etiqueta
+			var etiqueta = document.createElement("strong");
+			etiqueta.className = "popup-etiqueta";
+
+			etiqueta.textContent =
+				campo.replace(/_/g, " ") + ":";
+
+			// Crear valor
+			var dato = document.createElement("span");
+			dato.className = "popup-valor";
+			dato.textContent = String(valor);
+
+			// Agregar elementos
+			linea.appendChild(etiqueta);
+			linea.appendChild(dato);
+
+			contenido.appendChild(linea);
+
+		});
+
+		// Agregar contenido al popup
+		popup.appendChild(contenido);
+
+		// ==========================================
+		// CONFIGURAR POPUP LEAFLET
+		// ==========================================
+
+		marcador.bindPopup(popup, {
+			minWidth: 450,
+			maxWidth: 650,
+			maxHeight: 450,
+			className: "popup-cmmr",
+			autoPan: true,
+			keepInView: true
+		});
+
+		marcador.addTo(capa);
+
+				puntos.push([y, x]);
+			});
+
+			console.log(
+				estacionSeleccionada + " - Puntos:", puntos.length
+			);
 
 // ==========================================
 // MANTENER LA VISTA ACTUAL DEL MAPA
