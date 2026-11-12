@@ -133,7 +133,7 @@ function dibujarEstacion(estacionSeleccionada) {
 
         // MARCADOR
         var marcador = L.circleMarker([y, x], {
-            radius: 4,
+            radius: 8,
             color: "#dc2626",
             weight: 1,
             fillColor: "#ef4444",
@@ -226,9 +226,6 @@ function dibujarEstacion(estacionSeleccionada) {
 		// ==========================================
 
 		marcador.bindPopup(popup, {
-			minWidth: 450,
-			maxWidth: 650,
-			maxHeight: 450,
 			className: "popup-cmmr",
 			autoPan: true,
 			keepInView: true
