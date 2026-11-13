@@ -4,171 +4,290 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Centro de Monitoreo Durango</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="keywords" content="GEOMFU, SIG, mapas, geomática, Durango">
-    <meta name="description" content="CMMR - Plataforma de información geográfica">
+    <title>CMMR - Centro Municial de Monitoreo de Riesgo en Durango</title>
+
+    <meta name="keywords"
+          content="CMMR, GEOMFU, SIG, mapas, geomática, Durango">
+
+    <meta name="description"
+          content="Visor cartográfico CMMR de servicios de emergencia">
 
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Fuentes -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
+          rel="stylesheet">
 
     <!-- Iconos -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+          rel="stylesheet">
 
-    <!-- Bibliotecas originales -->
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+          rel="stylesheet">
 
-    <!-- Bootstrap y estilos -->
+    <!-- Bibliotecas de plantilla -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css"
+          rel="stylesheet">
+
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilos CMMR -->
     <link href="css/style.css" rel="stylesheet">
 
     <!-- Leaflet -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-    <!-- Estilo del mapa -->
-    <style>
-        #map {
-            width: 100%;
-            height: calc(100vh - 70px);
-            min-height: 450px;
-        }
-
-        .dropdown-item input[type="checkbox"] {
-            margin-right: 8px;
-        }
-    </style>
 </head>
 
 <body>
 
 <div class="container-fluid position-relative d-flex p-0">
 
-    <!-- Spinner -->
+    <!-- ==========================================
+         SPINNER
+    ========================================== -->
+
     <div id="spinner"
          class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+
         <div class="spinner-border text-primary"
-             style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Loading...</span>
+             style="width: 3rem; height: 3rem;"
+             role="status">
+
+            <span class="visually-hidden">
+                Cargando...
+            </span>
+
         </div>
+
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- ==========================================
+         MENÚ LATERAL
+    ========================================== -->
+
     <div class="sidebar pe-4 pb-3">
 
         <nav class="navbar bg-secondary navbar-dark">
 
-            <a href="index.html" class="navbar-brand mx-4 mb-3">
+            <!-- LOGO -->
+            <a href="index.html"
+               class="navbar-brand mx-4 mb-3">
+
                 <img src="img/CMMR_logo.png"
-                     alt="Logo institucional"
+                     alt="CMMR"
                      class="logo">
+
             </a>
 
             <div class="navbar-nav w-100">
 
-                <!-- SERVICIOS -->
+                <!-- ======================================
+                     SERVICIOS DE EMERGENCIA
+                ====================================== -->
+
                 <div class="nav-item dropdown">
 
-                    <a href="#"
-                       class="nav-link dropdown-toggle active"
-                       data-bs-toggle="dropdown">
+				<a href="#"
+				   class="nav-link dropdown-toggle active d-flex align-items-center"
+				   data-bs-toggle="dropdown"
+				   aria-expanded="false">
 
-                        <i class="fas fa-fire me-2"></i>
-                        Servicios
-                    </a>
+					<i class="fas fa-helmet-safety me-2"></i>
+
+					<span>
+						Servicios<br>
+						de Emergencia
+					</span>
+
+				</a>
 
                     <div class="dropdown-menu bg-transparent border-0">
 
+                        <!-- ==================================
+                             MAPA DE CALOR
+                        ================================== -->
+
                         <label class="dropdown-item">
+
+                            <input type="checkbox"
+                                   id="heatmap"
+                                   checked
+                                   onchange="mostrarHeatmap(this.checked)">
+
+                            Mapa de calor
+
+                        </label>
+						
+						<!-- SEPARADOR -->
+                        <div class="dropdown-divider"></div>
+						
+                        <!-- ESTACIÓN 1 -->
+                        <label class="dropdown-item">
+
                             <input type="checkbox"
                                    name="estaciones"
                                    value="1"
                                    onchange="mostrarServicios(this)">
+
                             Estación 1
+
                         </label>
 
+                        <!-- ESTACIÓN 2 -->
                         <label class="dropdown-item">
+
                             <input type="checkbox"
                                    name="estaciones"
                                    value="2"
                                    onchange="mostrarServicios(this)">
+
                             Estación 2
+
                         </label>
 
+                        <!-- ESTACIÓN 3 -->
                         <label class="dropdown-item">
+
                             <input type="checkbox"
                                    name="estaciones"
                                    value="3"
                                    onchange="mostrarServicios(this)">
+
                             Estación 3
+
                         </label>
 
+                        <!-- ESTACIÓN 4 -->
                         <label class="dropdown-item">
+
                             <input type="checkbox"
                                    name="estaciones"
                                    value="4"
                                    onchange="mostrarServicios(this)">
+
                             Estación 4
+
                         </label>
 
+                        <!-- ESTACIÓN 5 -->
                         <label class="dropdown-item">
+
                             <input type="checkbox"
                                    name="estaciones"
                                    value="5"
                                    onchange="mostrarServicios(this)">
+
                             Estación 5
+
                         </label>
 
                     </div>
+
                 </div>
 
-                <!-- INFORMACIÓN GEOGRÁFICA -->
-                <div class="nav-item dropdown">
+                <!-- ======================================
+                     ESTADÍSTICAS
+                ====================================== -->
 
-                    <a href="#"
-                       class="nav-link dropdown-toggle"
-                       data-bs-toggle="dropdown">
+                <div class="nav-item">
 
-                        <i class="fas fa-map me-2"></i>
-                        Información geográfica
+                    <a href="estadisticas.html"
+                       class="nav-link">
+
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Estadísticas
+
                     </a>
 
+                </div>
+
+                <!-- ======================================
+                     INFORMACIÓN GEOGRÁFICA
+                ====================================== -->
+
+                <div class="nav-item dropdown">
+
+					<a href="#"
+					   class="nav-link dropdown-toggle d-flex align-items-center"
+					   data-bs-toggle="dropdown"
+					   aria-expanded="false">
+
+						<i class="fas fa-map me-2"></i>
+
+						<span>
+							Información<br>
+							Geográfica
+						</span>
+
+					</a>
+
                     <div class="dropdown-menu bg-transparent border-0">
-                        <a href="#" class="dropdown-item">Municipios</a>
-                        <a href="#" class="dropdown-item">Vegetación</a>
-                        <a href="#" class="dropdown-item">Áreas protegidas</a>
+
+                        <a href="#" class="dropdown-item">
+                            Municipios
+                        </a>
+
+                        <a href="#" class="dropdown-item">
+                            Vegetación
+                        </a>
+
+                        <a href="#" class="dropdown-item">
+                            Áreas protegidas
+                        </a>
+
                     </div>
+
                 </div>
 
             </div>
+
         </nav>
+
     </div>
 
-    <!-- CONTENIDO -->
+    <!-- ==========================================
+         CONTENIDO PRINCIPAL
+    ========================================== -->
+
     <div class="content">
 
-        <!-- NAVBAR -->
+        <!-- BARRA SUPERIOR -->
         <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
 
+            <!-- LOGO MÓVIL -->
             <a href="index.html"
                class="navbar-brand d-flex d-lg-none me-4">
+
                 <h2 class="text-primary mb-0">
                     <i class="fas fa-fire"></i>
                 </h2>
+
             </a>
 
-            <a href="#" class="sidebar-toggler flex-shrink-0">
+            <!-- MOSTRAR / OCULTAR SIDEBAR -->
+            <a href="#"
+               class="sidebar-toggler flex-shrink-0">
+
                 <i class="fa fa-bars"></i>
+
             </a>
 
+            <!-- COORDENADAS -->
             <form class="d-none d-md-flex ms-4"
                   onsubmit="return false;">
 
@@ -176,8 +295,10 @@
                        type="text"
                        id="coordenadas"
                        placeholder="Buscar coordenadas">
+
             </form>
 
+            <!-- CONTACTO -->
             <div class="navbar-nav align-items-center ms-auto">
 
                 <div class="nav-item dropdown">
@@ -187,67 +308,99 @@
                        data-bs-toggle="dropdown">
 
                         <i class="fas fa-envelope me-2"></i>
+
                         <span class="d-none d-lg-inline-flex">
                             Contacto
                         </span>
+
                     </a>
 
                     <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
 
-                        <a href="contacto.html" class="dropdown-item">
-                            <i class="fas fa-envelope me-2"></i>
+                        <a href="contacto.html"
+                           class="dropdown-item">
                             Contacto
                         </a>
 
-                        <a href="acerca.html" class="dropdown-item">
-                            <i class="fas fa-info-circle me-2"></i>
+                        <a href="acerca.html"
+                           class="dropdown-item">
                             Acerca de
                         </a>
 
-                        <a href="ayuda.html" class="dropdown-item">
-                            <i class="fas fa-question-circle me-2"></i>
+                        <a href="ayuda.html"
+                           class="dropdown-item">
                             Ayuda
                         </a>
+
                     </div>
+
                 </div>
+
             </div>
+
         </nav>
 
-        <!-- MAPA -->
+        <!-- ======================================
+             MAPA
+        ====================================== -->
+
         <div class="container-fluid">
+
             <div class="row mx-0">
+
                 <div id="map"></div>
+
             </div>
+
         </div>
 
     </div>
+
 </div>
 
-<!-- Dependencias originales -->
+<!-- ==========================================
+     DEPENDENCIAS DE PLANTILLA
+========================================== -->
+
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="lib/chart/chart.min.js"></script>
 <script src="lib/easing/easing.min.js"></script>
 <script src="lib/waypoints/waypoints.min.js"></script>
 <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
 <script src="lib/tempusdominus/js/moment.min.js"></script>
 <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
 <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
 
-<!-- Leaflet -->
+<!-- ==========================================
+     LEAFLET
+========================================== -->
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- PapaParse -->
+<!-- MAPA DE CALOR -->
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+<!-- CSV -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-<!-- Mapa y capas -->
+<!-- ==========================================
+     ARCHIVOS DEL VISOR
+========================================== -->
+
 <script src="js/mapa.js"></script>
+
 <script src="js/coordenadas.js"></script>
+
+<!-- ESTACIONES Y HEATMAP -->
 <script src="js/servicios.js"></script>
 
-<!-- Plantilla -->
+<!-- PLANTILLA -->
 <script src="js/main.js"></script>
 
 </body>
 </html>
+

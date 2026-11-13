@@ -1,10 +1,16 @@
+
 /********** Template CSS **********/
+
 :root {
     --primary: #EB1616;
     --secondary: #191C24;
     --light: #6C7293;
     --dark: #000000;
 }
+
+/* ==========================================
+   BOTÓN VOLVER ARRIBA
+========================================== */
 
 .back-to-top {
     position: fixed;
@@ -14,23 +20,31 @@
     z-index: 99;
 }
 
+/* ==========================================
+   SPINNER
+========================================== */
 
-/*** Spinner ***/
 #spinner {
     opacity: 0;
     visibility: hidden;
-    transition: opacity .5s ease-out, visibility 0s linear .5s;
+    transition:
+        opacity .5s ease-out,
+        visibility 0s linear .5s;
     z-index: 99999;
 }
 
 #spinner.show {
-    transition: opacity .5s ease-out, visibility 0s linear 0s;
+    transition:
+        opacity .5s ease-out,
+        visibility 0s linear 0s;
     visibility: visible;
     opacity: 1;
 }
 
+/* ==========================================
+   BOTONES
+========================================== */
 
-/*** Button ***/
 .btn {
     transition: .5s;
 }
@@ -61,8 +75,10 @@
     border-radius: 50px;
 }
 
+/* ==========================================
+   DISEÑO GENERAL
+========================================== */
 
-/*** Layout ***/
 .sidebar {
     position: fixed;
     top: 0;
@@ -83,7 +99,12 @@
     transition: 0.5s;
 }
 
+/* ==========================================
+   PANTALLAS GRANDES
+========================================== */
+
 @media (min-width: 992px) {
+
     .sidebar {
         margin-left: 0;
     }
@@ -102,7 +123,12 @@
     }
 }
 
+/* ==========================================
+   PANTALLAS PEQUEÑAS
+========================================== */
+
 @media (max-width: 991.98px) {
+
     .sidebar {
         margin-left: -250px;
     }
@@ -117,8 +143,10 @@
     }
 }
 
+/* ==========================================
+   MENÚ LATERAL
+========================================== */
 
-/*** Navbar ***/
 .sidebar .navbar .navbar-nav .nav-link {
     padding: 7px 20px;
     color: var(--light);
@@ -150,6 +178,10 @@
     background: var(--secondary);
 }
 
+/* ==========================================
+   FLECHAS DE MENÚ
+========================================== */
+
 .sidebar .navbar .dropdown-toggle::after {
     position: absolute;
     top: 15px;
@@ -165,6 +197,10 @@
     transform: rotate(-180deg);
 }
 
+/* ==========================================
+   ELEMENTOS DEL MENÚ
+========================================== */
+
 .sidebar .navbar .dropdown-item {
     padding-left: 25px;
     border-radius: 0 30px 30px 0;
@@ -175,6 +211,35 @@
 .sidebar .navbar .dropdown-item.active {
     background: var(--dark);
 }
+
+/* ==========================================
+   CASILLAS DE ESTACIONES Y HEATMAP
+========================================== */
+
+.sidebar .dropdown-item:has(input[type="checkbox"]) {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar .dropdown-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--primary);
+    margin-right: 5px;
+}
+
+.sidebar .dropdown-divider {
+    border-top: 1px solid var(--light);
+    margin: 8px 15px;
+}
+
+/* ==========================================
+   BARRA DE NAVEGACIÓN SUPERIOR
+========================================== */
 
 .content .navbar .navbar-nav .nav-link {
     margin-left: 25px;
@@ -223,13 +288,16 @@
 }
 
 @media (max-width: 575.98px) {
+
     .content .navbar .navbar-nav .nav-link {
         margin-left: 15px;
     }
 }
 
+/* ==========================================
+   DATE PICKER
+========================================== */
 
-/*** Date Picker ***/
 .bootstrap-datetimepicker-widget.bottom {
     top: auto !important;
 }
@@ -256,15 +324,19 @@
     border-bottom-color: var(--primary);
 }
 
+/* ==========================================
+   BARRAS DE PROGRESO
+========================================== */
 
-/*** Testimonial ***/
 .progress .progress-bar {
     width: 0px;
     transition: 2s;
 }
 
+/* ==========================================
+   TESTIMONIAL
+========================================== */
 
-/*** Testimonial ***/
 .testimonial-carousel .owl-dots {
     margin-top: 24px;
     display: flex;
@@ -288,26 +360,43 @@
     border-color: var(--primary);
 }
 
+/* ==========================================
+   LOGO CMMR
+========================================== */
+
 .logo {
     width: 150px;
     height: auto;
     object-fit: contain;
 }
 
-/* ======================================================
+/* ==========================================
    VISOR CARTOGRÁFICO
-   ====================================================== */
+========================================== */
 
 #map {
     width: 100%;
     height: calc(100vh - 65px);
+    min-height: 450px;
+}
+
+/* ==========================================
+   LEAFLET - CONTROLES
+========================================== */
+
+.leaflet-container {
+    font-family: Arial, sans-serif;
+}
+
+.leaflet-control-zoom a {
+    font-weight: bold;
 }
 
 /* ==========================================
    CMMR - POPUP SERVICIOS DE EMERGENCIA
 ========================================== */
 
-/* Ventana Leaflet */
+/* Ventana principal */
 .popup-cmmr .leaflet-popup-content-wrapper {
     padding: 0 !important;
     border-radius: 10px !important;
@@ -316,21 +405,25 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.25);
 }
 
-/* Eliminar márgenes predeterminados */
+/* Ancho del popup */
 .popup-cmmr .leaflet-popup-content {
+    width: 600px !important;
+    max-width: calc(100vw - 60px) !important;
     margin: 0 !important;
-    width: 340px !important;
-    max-width: calc(100vw - 60px);
 }
 
-/* Contenedor general */
+/* Contenedor */
 .popup-cmmr .popup-servicios {
     width: 100%;
+    box-sizing: border-box;
     font-family: Arial, sans-serif;
     font-size: 13px;
 }
 
-/* Encabezado */
+/* ==========================================
+   ENCABEZADO DEL POPUP
+========================================== */
+
 .popup-cmmr .popup-encabezado {
     background: #174a78;
     color: #ffffff;
@@ -341,11 +434,15 @@
     line-height: 1.4;
 }
 
-/* Área desplazable */
+/* ==========================================
+   CONTENIDO DEL POPUP
+========================================== */
+
 .popup-cmmr .popup-contenido {
-    max-height: 350px;
+    max-height: 300px;
     overflow-y: auto;
-    padding: 10px;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 /* Filas */
@@ -354,12 +451,15 @@
     border-bottom: 1px solid #e5e7eb;
 }
 
-/* Alternar colores */
+/* Filas alternadas */
 .popup-cmmr .popup-fila:nth-child(even) {
     background: #f3f6fa;
 }
 
-/* Nombre del atributo */
+/* ==========================================
+   ETIQUETAS Y VALORES
+========================================== */
+
 .popup-cmmr .popup-etiqueta {
     display: block;
     color: #174a78;
@@ -369,7 +469,6 @@
     text-transform: uppercase;
 }
 
-/* Valor del atributo */
 .popup-cmmr .popup-valor {
     display: block;
     color: #333333;
@@ -379,7 +478,10 @@
     overflow-wrap: anywhere;
 }
 
-/* Barra de desplazamiento */
+/* ==========================================
+   BARRA DE DESPLAZAMIENTO DEL POPUP
+========================================== */
+
 .popup-cmmr .popup-contenido::-webkit-scrollbar {
     width: 6px;
 }
@@ -389,30 +491,67 @@
     border-radius: 5px;
 }
 
-/* Botón cerrar */
+/* ==========================================
+   BOTÓN CERRAR POPUP
+========================================== */
+
 .popup-cmmr .leaflet-popup-close-button {
     color: #ffffff !important;
     font-size: 20px !important;
     z-index: 10;
 }
 
-/* Aumentar ancho del popup */
-.popup-cmmr .leaflet-popup-content {
-    width: 600px !important;
-    max-width: calc(100vw - 60px) !important;
-    margin: 0 !important;
+/* ==========================================
+   CMMR - MARCADORES DE SERVICIOS
+========================================== */
+
+.punto-servicio {
+    fill: #ef4444;
+    fill-opacity: 0.65;
+    stroke: #dc2626;
+    stroke-width: 2px;
+    stroke-opacity: 1;
 }
 
-/* Ajustar contenedor */
-.popup-cmmr .popup-servicios {
-    width: 100%;
-    box-sizing: border-box;
+/* ==========================================
+   MAPA DE CALOR
+========================================== */
+
+/*
+   Leaflet.heat utiliza Canvas.
+   No requiere reglas CSS adicionales.
+
+   Los parámetros de visualización
+   se configuran en servicios.js:
+
+   radius
+   blur
+   maxZoom
+   minOpacity
+   gradient
+*/
+
+/* ==========================================
+   AJUSTES RESPONSIVOS DEL POPUP
+========================================== */
+
+@media (max-width: 767.98px) {
+
+    .popup-cmmr .leaflet-popup-content {
+        max-width: calc(100vw - 60px) !important;
+    }
+
+    .popup-cmmr .popup-contenido {
+        max-height: 250px;
+        padding: 10px;
+    }
+
+    .popup-cmmr .popup-encabezado {
+        font-size: 12px;
+        padding: 12px 25px 12px 10px;
+    }
 }
 
-/* Ajustar contenido */
-.popup-cmmr .popup-contenido {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 15px;
-    box-sizing: border-box;
-}
+/* ==========================================
+   FIN STYLE.CSS
+========================================== */
