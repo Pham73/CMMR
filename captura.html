@@ -1,0 +1,712 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CMMR | Captura de servicios de emergencia</title>
+
+    <meta name="keywords"
+          content="CMMR, GEOMFU, SIG, mapas, geomática, Durango">
+
+    <meta name="description"
+          content="Visor cartográfico CMMR de servicios de emergencia">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Fuentes -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Iconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <!-- Bibliotecas de plantilla -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css"
+          rel="stylesheet">
+
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilos CMMR -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+
+<style>
+  body {background:#f3f6fa;}
+  #mapaCaptura {height:410px;min-height:340px;border-radius:10px;border:1px solid #d6dde5;z-index:0;}
+  #capturaContenido .cmmr-card {border:0;box-shadow:0 2px 14px #23304712;background:#fff;color:#202b39;}
+  #capturaContenido .form-label {color:#283545;font-weight:600;}
+  #capturaContenido .form-control,#capturaContenido .form-select {background:#fff;color:#212529;border:1px solid #cbd5df;}
+  #capturaContenido .required:after {content:' *';color:#dc3545;}
+  #capturaContenido .sticky-map {position:sticky;top:86px;}
+  #capturaContenido .small-help {font-size:.85rem;color:#596777;}
+  #capturaContenido textarea {min-height:90px;}
+  #capturaContenido .card-body {padding:1.4rem;}
+  #capturaContenido .alert {white-space:normal;}
+  @media(max-width:991px){#capturaContenido .sticky-map{position:static;}}
+</style>
+</head>
+
+<body>
+
+<div class="container-fluid position-relative d-flex p-0">
+
+    <!-- ==========================================
+         SPINNER
+    ========================================== -->
+
+    <div id="spinner"
+         class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+
+        <div class="spinner-border text-primary"
+             style="width: 3rem; height: 3rem;"
+             role="status">
+
+            <span class="visually-hidden">
+                Cargando...
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         MENÚ LATERAL
+    ========================================== -->
+
+    <div class="sidebar pe-4 pb-3">
+
+        <nav class="navbar bg-secondary navbar-dark">
+
+            <!-- LOGO -->
+            <a href="index.html"
+               class="navbar-brand mx-4 mb-3">
+
+                <img src="img/CMMR_logo.png"
+                     alt="CMMR"
+                     class="logo">
+
+            </a>
+
+            <div class="navbar-nav w-100">
+                <a href="captura.html" class="nav-link active"><i class="fas fa-pen-to-square me-2"></i>Captura de servicios</a>
+                <a href="index.html" class="nav-link"><i class="fas fa-map-location-dot me-2"></i>Visor cartográfico</a>
+
+                <!-- ======================================
+                     SERVICIOS DE EMERGENCIA
+                ====================================== -->
+
+                <div class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-helmet-safety me-2"></i>Servicios de emergencia</a></div>
+
+                <!-- ======================================
+                     ESTADÍSTICAS
+                ====================================== -->
+
+                <div class="nav-item">
+
+                    <a href="estadisticas.html"
+                       class="nav-link">
+
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Estadísticas
+
+                    </a>
+
+                </div>
+
+                <!-- ======================================
+                     INFORMACIÓN GEOGRÁFICA
+                ====================================== -->
+
+                <div class="nav-item dropdown">
+
+					<a href="#"
+					   class="nav-link dropdown-toggle d-flex align-items-center"
+					   data-bs-toggle="dropdown"
+					   aria-expanded="false">
+
+						<i class="fas fa-map me-2"></i>
+
+						<span>
+							Información<br>
+							Geográfica
+						</span>
+
+					</a>
+
+                    <div class="dropdown-menu bg-transparent border-0">
+
+                        <a href="#" class="dropdown-item">
+                            Municipios
+                        </a>
+
+                        <a href="#" class="dropdown-item">
+                            Vegetación
+                        </a>
+
+                        <a href="#" class="dropdown-item">
+                            Áreas protegidas
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </div>
+
+    <!-- ==========================================
+         CONTENIDO PRINCIPAL
+    ========================================== -->
+
+    <div class="content">
+
+        <!-- BARRA SUPERIOR -->
+        <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+
+            <!-- LOGO MÓVIL -->
+            <a href="index.html"
+               class="navbar-brand d-flex d-lg-none me-4">
+
+                <h2 class="text-primary mb-0">
+                    <i class="fas fa-fire"></i>
+                </h2>
+
+            </a>
+
+            <!-- MOSTRAR / OCULTAR SIDEBAR -->
+            <a href="#"
+               class="sidebar-toggler flex-shrink-0">
+
+                <i class="fa fa-bars"></i>
+
+            </a>
+
+            <!-- COORDENADAS -->
+            <form class="d-none d-md-flex ms-4"
+                  onsubmit="return false;">
+
+                <input class="form-control bg-dark border-0"
+                       type="text"
+                       id="coordenadas"
+                       placeholder="Buscar coordenadas">
+
+            </form>
+
+            <!-- CONTACTO -->
+            <div class="navbar-nav align-items-center ms-auto">
+
+                <div class="nav-item dropdown">
+
+                    <a href="#"
+                       class="nav-link dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <i class="fas fa-envelope me-2"></i>
+
+                        <span class="d-none d-lg-inline-flex">
+                            Contacto
+                        </span>
+
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+
+                        <a href="contacto.html"
+                           class="dropdown-item">
+                            Contacto
+                        </a>
+
+                        <a href="acerca.html"
+                           class="dropdown-item">
+                            Acerca de
+                        </a>
+
+                        <a href="ayuda.html"
+                           class="dropdown-item">
+                            Ayuda
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+        <!-- CAPTURA DE SERVICIOS -->
+        <main class="container-fluid px-4 py-4" id="capturaContenido">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <div><h1 class="h4 mb-1">Captura de servicios de emergencia</h1><p class="text-muted mb-0">Centro Municipal de Monitoreo de Riesgo · Durango</p></div>
+            <span class="badge bg-primary">CMMR · Registro de servicios</span>
+          </div>
+<div class="card mb-3 cmmr-card"><div class="card-body">
+<h2 class="h5">Acceso del personal autorizado</h2>
+<div class="row g-2 align-items-end"><div class="col-md-4"><label class="form-label" for="correo">Usuario</label><input id="correo" type="text" class="form-control" autocomplete="username" autocapitalize="none" spellcheck="false"></div><div class="col-md-4"><label class="form-label" for="contrasena">Contraseña</label><input id="contrasena" type="password" class="form-control" autocomplete="current-password"></div><div class="col-md-4 d-flex gap-2"><button id="entrar" class="btn btn-primary" type="button">Iniciar sesión</button><button id="salir" class="btn btn-outline-secondary" type="button">Cerrar sesión</button></div></div>
+<div id="sesionEstado" class="small-help mt-2" role="status">Comprobando sesión...</div>
+</div></div>
+<form id="formServicio" class="row g-3" autocomplete="off">
+<div class="col-lg-7"><div class="card cmmr-card"><div class="card-body">
+<h2 class="h5 mb-3">Información del servicio</h2>
+<div class="row g-3" id="camposFormulario"></div>
+<div class="d-flex gap-2 mt-4"><button class="btn btn-success" type="submit" id="guardar" disabled>Guardar servicio</button><button class="btn btn-outline-secondary" type="reset">Limpiar formulario</button></div>
+<div id="resultado" class="mt-3" role="status" aria-live="polite"></div>
+</div></div></div>
+<div class="col-lg-5"><div class="sticky-map card"><div class="card-body">
+<h2 class="h5">Ubicación geográfica</h2><p class="small-help mb-2">Haz clic sobre el mapa o arrastra el marcador. También puedes escribir latitud y longitud.</p>
+<div id="mapaCaptura"></div>
+<div class="row g-2 mt-2"><div class="col-6"><label class="form-label required" for="y">Latitud (y)</label><input id="y" class="form-control" type="number" min="-90" max="90" step="any" required></div><div class="col-6"><label class="form-label required" for="x">Longitud (x)</label><input id="x" class="form-control" type="number" min="-180" max="180" step="any" required></div></div>
+<button id="ubicar" type="button" class="btn btn-outline-primary btn-sm mt-2">Ubicar coordenadas</button>
+<div class="small-help mt-2">WGS84 · EPSG:4326. El punto se guarda mediante x/y; el trigger de PostGIS genera geom.</div>
+</div></div></div>
+</form>
+        </main>
+
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DEPENDENCIAS DE PLANTILLA
+========================================== -->
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="lib/chart/chart.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/waypoints/waypoints.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+<script src="lib/tempusdominus/js/moment.min.js"></script>
+<script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- ==========================================
+     LEAFLET
+========================================== -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- MAPA DE CALOR -->
+
+
+<!-- CSV -->
+
+
+<!-- ==========================================
+     ARCHIVOS DEL VISOR
+========================================== -->
+
+
+
+
+
+<!-- ESTACIONES Y HEATMAP -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+'use strict';
+// CONFIGURACIÓN: reemplaza únicamente la clave pública.
+const SUPABASE_URL = 'https://quqpxsxwieqievqkccpn.supabase.co';
+const SUPABASE_PUBLIC_KEY = 'sb_publishable_ClvmTbRa6ursKGP0tnYgpw_9V9fe-nB';
+const TABLA = 'servicios_emergencia';
+const $ = id => document.getElementById(id);
+const resultado = $('resultado');
+const CATALOGO_SERVICIOS = [
+ [
+  {
+   "codigo": "TS 1",
+   "descripcion": "INCENDIO EN TANQUES O CILINDROS DE GAS L.P."
+  },
+  {
+   "codigo": "TS 2",
+   "descripcion": "INCENDIOS EN EDIFICACIONES INDUSTRIALES"
+  },
+  {
+   "codigo": "TS 3",
+   "descripcion": "INCENDIOS EN EDIFICACIONES COMERCIALES"
+  },
+  {
+   "codigo": "TS 4",
+   "descripcion": "INCENDIO DE RELLENO SANITARIO"
+  },
+  {
+   "codigo": "TS 5",
+   "descripcion": "INCENDIOS EN VIVIENDAS DE MATS. FRÁGILES"
+  },
+  {
+   "codigo": "TS 6",
+   "descripcion": "INCENDIOS EN CASA HABITACIÓN"
+  },
+  {
+   "codigo": "TS 7",
+   "descripcion": "INCENDIOS EN VEHÍCULOS"
+  },
+  {
+   "codigo": "TS 8",
+   "descripcion": "INCENDIOS DE ÁRBOLES O POSTES EN VÍA PÚBLICA"
+  },
+  {
+   "codigo": "TS 9",
+   "descripcion": "INCENDIOS EN LOTES BALDÍOS Y/O ZACATALES URBANOS"
+  },
+  {
+   "codigo": "TS 10",
+   "descripcion": "FUGAS DE GAS L.P. EN TANQUES ESTACIONARIOS O CILINDROS"
+  },
+  {
+   "codigo": "TS 11",
+   "descripcion": "RESCATE DE PERSONAS EN ACCIDENTES"
+  },
+  {
+   "codigo": "TS 12",
+   "descripcion": "ATENCIÓN PREHOSPITALARIA"
+  },
+  {
+   "codigo": "TS 13",
+   "descripcion": "APOYO EN ACCIDENTES DE TRÁNSITO"
+  },
+  {
+   "codigo": "TS 14",
+   "descripcion": "CONTROL DE DERRAMES DE COMBUSTIBLES Y MAT. PELIGROSOS"
+  },
+  {
+   "codigo": "TS 15",
+   "descripcion": "INCENDIOS EN TLAZOLERAS Y/O ZACATALES RURALES"
+  },
+  {
+   "codigo": "TS 16",
+   "descripcion": "ATENCIÓN A REPORTES DE OLOR A COMBUSTIBLES"
+  }
+ ],
+ [
+  {
+   "codigo": "TS 17",
+   "descripcion": "RECUPERACIÓN DE CADÁVERES EN PRESAS, LAGOS Y RÍOS"
+  },
+  {
+   "codigo": "TS 18",
+   "descripcion": "CAPTURA DE ANIMALES"
+  },
+  {
+   "codigo": "TS 19",
+   "descripcion": "CAPTURA O TRASLADO DE ENJAMBRES DE ABEJAS"
+  },
+  {
+   "codigo": "TS 20",
+   "descripcion": "RETIRAR ÁRBOLES, CABLES, POSTES O ANUNCIOS"
+  },
+  {
+   "codigo": "TS 21",
+   "descripcion": "ATENCIÓN EN INUNDACIONES"
+  }
+ ],
+ [
+  {
+   "codigo": "TS 22",
+   "descripcion": "APOYO EN OPERATIVOS ESPECIALES"
+  },
+  {
+   "codigo": "TS 23",
+   "descripcion": "TRASLADO DE INDIGENTES O DAMNIFICADOS"
+  },
+  {
+   "codigo": "TS 24",
+   "descripcion": "SERVICIO SOCIAL"
+  },
+  {
+   "codigo": "TS 25",
+   "descripcion": "INSPECCIÓN DE VIVIENDAS"
+  },
+  {
+   "codigo": "TS 26",
+   "descripcion": "RECORRIDO"
+  },
+  {
+   "codigo": "TS 27",
+   "descripcion": "LIMPIEZA DE ALCANTARILLAS"
+  },
+  {
+   "codigo": "TS 28",
+   "descripcion": "INSPECCIÓN DE QUEMA DE PÓLVORA"
+  },
+  {
+   "codigo": "TS 29",
+   "descripcion": "FALSA ALARMA"
+  }
+ ],
+ [
+  {
+   "codigo": "TS 30",
+   "descripcion": "INCENDIO EN TANQUES O CILINDROS DE GAS L.P."
+  },
+  {
+   "codigo": "TS 31",
+   "descripcion": "INCENDIOS EN EDIFICACIONES INDUSTRIALES"
+  },
+  {
+   "codigo": "TS 32",
+   "descripcion": "INCENDIOS EN EDIFICACIONES COMERCIALES"
+  },
+  {
+   "codigo": "TS 33",
+   "descripcion": "INCENDIO DE RELLENO SANITARIO"
+  },
+  {
+   "codigo": "TS 34",
+   "descripcion": "INCENDIOS EN VIVIENDAS DE MATS. FRÁGILES"
+  },
+  {
+   "codigo": "TS 35",
+   "descripcion": "INCENDIOS EN CASA HABITACIÓN"
+  },
+  {
+   "codigo": "TS 36",
+   "descripcion": "INCENDIOS EN VEHÍCULOS"
+  },
+  {
+   "codigo": "TS 37",
+   "descripcion": "INCENDIOS DE ÁRBOLES O POSTES EN VÍA PÚBLICA"
+  },
+  {
+   "codigo": "TS 38",
+   "descripcion": "INCENDIOS EN LOTES BALDÍOS Y/O ZACATALES"
+  },
+  {
+   "codigo": "TS 39",
+   "descripcion": "FUGAS DE GAS L.P. EN TANQUES ESTACIONARIOS O CILINDROS"
+  },
+  {
+   "codigo": "TS 40",
+   "descripcion": "RESCATE DE PERSONAS EN ACCIDENTES"
+  },
+  {
+   "codigo": "TS 41",
+   "descripcion": "ATENCIÓN PREHOSPITALARIA"
+  },
+  {
+   "codigo": "TS 42",
+   "descripcion": "APOYO EN ACCIDENTES DE TRÁNSITO"
+  },
+  {
+   "codigo": "TS 43",
+   "descripcion": "CONTROL DE DERRAMES DE COMBUSTIBLES Y MAT. PELIGROSOS"
+  },
+  {
+   "codigo": "TS 44",
+   "descripcion": "ATENCIÓN A REPORTES DE OLOR A COMBUSTIBLES"
+  }
+ ]
+];
+const campos = [
+ ['FECHA','Fecha y hora','datetime-local',true],
+ ['SUBCOMANDANTE','Subcomandante','text'],
+ ['NO_ESTACION','Estación','select',true,['ECO_1','ECO_2','ECO_3','ECO_4','ECO_5']],
+ ['ZONA','Zona','select',true,['URBANA','RURAL']],
+ ['SERVICIOS_PRIORIDAD_UNO','Servicio prioridad uno','select',false,CATALOGO_SERVICIOS[0]],
+ ['SERVICIOS_PRIORIDAD_DOS','Servicio prioridad dos','select',false,CATALOGO_SERVICIOS[1]],
+ ['SERVICIOS_PRIORIDAD_TRES','Servicio prioridad tres','select',false,CATALOGO_SERVICIOS[2]],
+ ['SERVICIOS_PRIORIDAD_UNO_ZONARURAL','Servicio prioridad uno zona rural','select',false,CATALOGO_SERVICIOS[3]],
+ ['HORA_SALIDA_UNIDAD','Hora salida de unidad','time'],
+ ['HORA_LLEGADA_UNIDAD','Hora llegada de unidad','time'],
+ ['TERMINO_SERVICIO','Término del servicio','time'],
+ ['NOMBRE_REPORTANTE','Nombre del reportante','text'],
+ ['TELEFONO','Teléfono','tel'],
+ ['LUGAR','Lugar','text',true],
+ ['UNIDAD_PARTICIPAN','Unidades participantes','text'],
+ ['PERSONAL_OPERATIVO','Personal operativo','textarea'],
+ ['ESTACION_QUE_APOYA','Estación que apoya','text'],
+ ['CORPORACIONES_PARTICIPAN','Corporaciones participantes','textarea'],
+ ['NARRATIVA_HECHOS','Narrativa de los hechos','textarea'],
+ ['CORPORACIONES','Corporaciones','text'],
+ ['CAPTURA_REGISTRO','Captura del registro','text'],
+ ['COLONIA_ENTRECALLES','Colonia y entrecalles','text']
+];
+for (const [nombre,etiqueta,tipo,obligatorio,opciones] of campos) {
+ const col=document.createElement('div');col.className=(tipo==='textarea'?'col-12':'col-md-6');
+ const label=document.createElement('label');label.htmlFor=nombre;label.className='form-label'+(obligatorio?' required':'');label.textContent=etiqueta;col.appendChild(label);
+ let control;
+ if(tipo==='textarea'){control=document.createElement('textarea');control.rows=3;}
+ else if(tipo==='select'){
+  control=document.createElement('select');
+  const placeholder=document.createElement('option');placeholder.value='';
+  placeholder.textContent=nombre==='NO_ESTACION'?'Seleccionar estación':nombre==='ZONA'?'Seleccionar zona':'Seleccionar tipo de servicio';
+  control.appendChild(placeholder);
+  for(const opcion of opciones){
+   const op=document.createElement('option');
+   op.value=typeof opcion==='string'?opcion:opcion.descripcion;
+   op.textContent=typeof opcion==='string'?opcion:`${opcion.codigo} - ${opcion.descripcion}`;
+   control.appendChild(op);
+  }
+ }
+ else {control=document.createElement('input');control.type=tipo;}
+ control.id=nombre;control.name=nombre;if(nombre==='NO_ESTACION')control.disabled=true;control.className='form-control'+(tipo==='select'?' form-select':'');control.required=Boolean(obligatorio);col.appendChild(control);$('camposFormulario').appendChild(col);
+}
+// Zona independiente. Cada servicio se almacena en su columna de prioridad.
+// Si se selecciona una categoría, se limpian las otras tres para evitar duplicidad.
+const CAMPOS_SERVICIO = [
+ 'SERVICIOS_PRIORIDAD_UNO','SERVICIOS_PRIORIDAD_DOS',
+ 'SERVICIOS_PRIORIDAD_TRES','SERVICIOS_PRIORIDAD_UNO_ZONARURAL'
+];
+for(const nombre of CAMPOS_SERVICIO){
+ $(nombre).addEventListener('change',()=>{
+  if(!$(nombre).value)return;
+  for(const otro of CAMPOS_SERVICIO){if(otro!==nombre)$(otro).value='';}
+ });
+}
+// Leaflet: mapa independiente del mapa principal de CMMR.
+const mapa=L.map('mapaCaptura').setView([24.0277,-104.6532],13);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(mapa);
+const marcador=L.marker([24.0277,-104.6532],{draggable:true}).addTo(mapa);
+function fijarCoordenadas(lat,lng,centrar=false){
+ if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180)throw Error('Coordenadas fuera de rango');
+ $('y').value=lat.toFixed(7);$('x').value=lng.toFixed(7);marcador.setLatLng([lat,lng]);if(centrar)mapa.panTo([lat,lng]);
+}
+mapa.on('click',e=>fijarCoordenadas(e.latlng.lat,e.latlng.lng));
+marcador.on('dragend',()=>{const p=marcador.getLatLng();fijarCoordenadas(p.lat,p.lng);});
+$('ubicar').addEventListener('click',()=>{
+ try {if($('x').value.trim()===''||$('y').value.trim()==='')throw Error('Escribe ambas coordenadas');fijarCoordenadas(Number($('y').value),Number($('x').value),true);}
+ catch(e){mostrar(e.message,'danger');}
+});
+$('x').addEventListener('change',sincronizarDesdeCampos);
+$('y').addEventListener('change',sincronizarDesdeCampos);
+function sincronizarDesdeCampos(){if($('x').value!==''&&$('y').value!==''){const lat=Number($('y').value),lng=Number($('x').value);if(Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180){marcador.setLatLng([lat,lng]);mapa.panTo([lat,lng]);}}}
+fijarCoordenadas(24.0277,-104.6532);
+function fechaLocal(){const d=new Date();const dos=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${dos(d.getMonth()+1)}-${dos(d.getDate())}T${dos(d.getHours())}:${dos(d.getMinutes())}`;}
+$('FECHA').value=fechaLocal();
+function mostrar(mensaje,tipo='info'){resultado.className=`alert alert-${tipo} mt-3`;resultado.textContent=mensaje;}
+let cliente=null;
+try {
+ if(SUPABASE_PUBLIC_KEY.includes('PEGAR_AQUI'))throw Error('Configura SUPABASE_PUBLIC_KEY antes de usar el formulario');
+ cliente=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLIC_KEY);
+}catch(e){$('sesionEstado').textContent=e.message;mostrar(e.message,'warning');}
+let perfilActual = null;
+let sesionVersion = 0;
+function aplicarEstacion(){
+ const selector=$('NO_ESTACION');
+ if(!perfilActual){selector.value='';selector.disabled=true;return;}
+ const esAdmin=perfilActual.rol==='ADMIN' && perfilActual.estacion==='ADMIN';
+ selector.disabled=!esAdmin;
+ if(!esAdmin)selector.value=perfilActual.estacion;
+}
+async function actualizarSesion(){
+ if(!cliente)return;
+ const version=++sesionVersion;
+ $('guardar').disabled=true;
+ const {data:{session},error}=await cliente.auth.getSession();
+ if(version!==sesionVersion)return;
+ if(error||!session){
+  perfilActual=null;aplicarEstacion();
+  $('sesionEstado').textContent='Inicia sesión para guardar servicios';
+  return;
+ }
+ const {data:perfil,error:perfilError}=await cliente.from('usuarios_cmmr')
+  .select('usuario,estacion,rol,activo')
+  .eq('usuario_id',session.user.id).maybeSingle();
+ if(version!==sesionVersion)return;
+ if(perfilError||!perfil||!perfil.activo){
+  perfilActual=null;aplicarEstacion();
+  $('sesionEstado').textContent='Cuenta sin perfil activo o sin permiso de lectura';
+  return;
+ }
+ perfilActual=perfil;aplicarEstacion();
+ $('sesionEstado').textContent=`Sesión iniciada: ${perfil.usuario} · ${perfil.estacion} (${perfil.rol})`;
+ $('guardar').disabled=false;
+}
+$('entrar').addEventListener('click',async()=>{
+ if(!cliente)return;
+ const usuario=$('correo').value.trim().toLowerCase();
+ const contrasena=$('contrasena').value;
+ if(!usuario||!contrasena){mostrar('Escribe usuario y contraseña','warning');return;}
+ $('entrar').disabled=true;
+ try{
+  const {data,error}=await cliente.functions.invoke('login-cmmr',{
+   body:{usuario,contrasena}
+  });
+  if(error)throw new Error('No fue posible contactar login-cmmr. Revisa la configuración de la función.');
+  if(!data?.access_token||!data?.refresh_token){
+   throw new Error(data?.error||'Usuario o contraseña incorrectos');
+  }
+  const {error:sesionError}=await cliente.auth.setSession({
+   access_token:data.access_token,
+   refresh_token:data.refresh_token
+  });
+  if(sesionError)throw sesionError;
+  $('contrasena').value='';
+  await actualizarSesion();
+  if(!perfilActual)throw new Error('La cuenta no tiene un perfil activo autorizado');
+  mostrar('Sesión iniciada correctamente','success');
+ }catch(error){
+  mostrar('No fue posible iniciar sesión: '+error.message,'danger');
+ }finally{$('entrar').disabled=false;}
+});
+$('salir').addEventListener('click',async()=>{
+ if(!cliente)return;
+ await cliente.auth.signOut();
+ perfilActual=null;aplicarEstacion();
+ await actualizarSesion();
+ mostrar('Sesión cerrada','secondary');
+});
+if(cliente){
+ cliente.auth.onAuthStateChange(()=>{setTimeout(()=>{actualizarSesion();},0);});
+ actualizarSesion();
+}
+$('formServicio').addEventListener('submit',async e=>{
+ e.preventDefault();if(!cliente)return;
+ const {data:{user},error:authError}=await cliente.auth.getUser();
+ if(authError||!user||!perfilActual){mostrar('Inicia sesión con un usuario autorizado antes de guardar','warning');return;}
+ aplicarEstacion();
+ if(!$('formServicio').reportValidity())return;
+ if(perfilActual.rol!=='ADMIN' && $('NO_ESTACION').value!==perfilActual.estacion){mostrar('Estación no autorizada','danger');return;}
+ const lat=Number($('y').value),lng=Number($('x').value);
+ if($('x').value===''||$('y').value===''||!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180){mostrar('Coordenadas inválidas','danger');return;}
+ const registro={x:lng,y:lat};
+ for(const [nombre,,tipo] of campos){let valor=$(nombre).value.trim();if(!valor)continue;if(tipo==='datetime-local')valor=valor.replace('T',' ')+':00';registro[nombre]=valor;}
+ if(perfilActual.rol!=='ADMIN')registro.NO_ESTACION=perfilActual.estacion;
+ $('guardar').disabled=true;
+ try{
+  // No enviar OBJECTID ni geom: PostgreSQL y el trigger los generan.
+  const {error}=await cliente.from(TABLA).insert(registro);
+  if(error)throw error;
+  mostrar('Servicio registrado correctamente','success');
+  $('formServicio').reset();$('FECHA').value=fechaLocal();fijarCoordenadas(24.0277,-104.6532,true);aplicarEstacion();
+ }catch(error){mostrar('No se pudo guardar: '+error.message,'danger');console.error(error);}
+ finally{await actualizarSesion();}
+});
+$('formServicio').addEventListener('reset',()=>{setTimeout(()=>{$('FECHA').value=fechaLocal();fijarCoordenadas(24.0277,-104.6532,true);aplicarEstacion();},0);});
+
+</script>
+<!-- PLANTILLA -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
+
