@@ -279,8 +279,10 @@
 <h2 class="h5">Ubicación geográfica</h2><p class="small-help mb-2">Haz clic sobre el mapa o arrastra el marcador. También puedes escribir latitud y longitud.</p>
 <div id="mapaCaptura"></div>
 <div class="row g-2 mt-2"><div class="col-6"><label class="form-label required" for="y">Latitud (y)</label><input id="y" class="form-control" type="number" min="-90" max="90" step="any" required></div><div class="col-6"><label class="form-label required" for="x">Longitud (x)</label><input id="x" class="form-control" type="number" min="-180" max="180" step="any" required></div></div>
-<button id="ubicar" type="button" class="btn btn-outline-primary btn-sm mt-2">Ubicar coordenadas</button>
-<div class="small-help mt-2">WGS84 · EPSG:4326. El punto se guarda mediante x/y; el trigger de PostGIS genera geom.</div>
+<div class="d-flex flex-wrap gap-2 mt-2">
+<button id="ubicar" type="button" class="btn btn-outline-primary btn-sm">Ubicar coordenadas</button>
+<button id="autolocalizar" type="button" class="btn btn-primary btn-sm"><i class="fas fa-location-crosshairs me-1"></i> Mi ubicación GPS</button>
+</div>
 </div></div></div>
 <div class="col-12"><div class="card cmmr-card"><div class="card-body">
 <div class="d-flex flex-column flex-sm-row gap-2">
@@ -595,6 +597,40 @@ function fijarCoordenadas(lat,lng,centrar=false){
  if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180)throw Error('Coordenadas fuera de rango');
  $('y').value=lat.toFixed(7);$('x').value=lng.toFixed(7);marcador.setLatLng([lat,lng]);if(centrar)mapa.panTo([lat,lng]);
 }
+// Obtener ubicación del dispositivo, actualizar marcador y campos x/y.
+$('autolocalizar').addEventListener('click', () => {
+ const boton = $('autolocalizar');
+ if (!navigator.geolocation) {
+  mostrar('Este navegador no admite geolocalización.', 'warning');
+  return;
+ }
+ if (!window.isSecureContext) {
+  mostrar('El GPS requiere HTTPS o localhost. Abre la página mediante una conexión segura.', 'warning');
+  return;
+ }
+ boton.disabled = true;
+ const textoOriginal = boton.innerHTML;
+ boton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Localizando...';
+ navigator.geolocation.getCurrentPosition(
+  posicion => {
+   const lat = posicion.coords.latitude;
+   const lng = posicion.coords.longitude;
+   fijarCoordenadas(lat, lng, true);
+   mapa.setView([lat, lng], 17);
+   mapa.invalidateSize();
+   mostrar('Ubicación GPS obtenida. Precisión aproximada: ' + Math.round(posicion.coords.accuracy) + ' m.', 'success');
+   boton.disabled = false;
+   boton.innerHTML = textoOriginal;
+  },
+  error => {
+   const mensajes = {1:'Permiso de ubicación denegado.',2:'Ubicación no disponible.',3:'Tiempo de espera agotado.'};
+   mostrar(mensajes[error.code] || 'No se pudo obtener la ubicación GPS.', 'warning');
+   boton.disabled = false;
+   boton.innerHTML = textoOriginal;
+  },
+  {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+ );
+});
 mapa.on('click',e=>fijarCoordenadas(e.latlng.lat,e.latlng.lng));
 marcador.on('dragend',()=>{const p=marcador.getLatLng();fijarCoordenadas(p.lat,p.lng);});
 $('ubicar').addEventListener('click',()=>{
