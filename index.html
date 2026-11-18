@@ -1,12 +1,17 @@
- 
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>CMMR - Centro Municial de Monitoreo de Riesgo en Durango</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        CMMR - Centro Municipal de Monitoreo de Riesgo en Durango
+    </title>
 
     <meta name="keywords"
           content="CMMR, GEOMFU, SIG, mapas, geomática, Durango">
@@ -14,40 +19,43 @@
     <meta name="description"
           content="Visor cartográfico CMMR de servicios de emergencia">
 
-    <!-- Favicon -->
+    <!-- FAVICON -->
     <link href="img/favicon.ico" rel="icon">
 
-    <!-- Fuentes -->
+    <!-- FUENTES -->
     <link rel="preconnect"
           href="https://fonts.googleapis.com">
 
     <link rel="preconnect"
-          href="https://fonts.gstatic.com" crossorigin>
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
           rel="stylesheet">
 
-    <!-- Iconos -->
+    <!-- ICONOS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
           rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
           rel="stylesheet">
 
-    <!-- Bibliotecas de plantilla -->
+    <!-- BIBLIOTECAS DE PLANTILLA -->
     <link href="lib/owlcarousel/assets/owl.carousel.min.css"
           rel="stylesheet">
 
     <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css"
           rel="stylesheet">
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- BOOTSTRAP -->
+    <link href="css/bootstrap.min.css"
+          rel="stylesheet">
 
-    <!-- Estilos CMMR -->
-    <link href="css/style.css" rel="stylesheet">
+    <!-- ESTILOS CMMR -->
+    <link href="css/style.css"
+          rel="stylesheet">
 
-    <!-- Leaflet -->
+    <!-- LEAFLET -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
@@ -65,7 +73,7 @@
          class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
 
         <div class="spinner-border text-primary"
-             style="width: 3rem; height: 3rem;"
+             style="width:3rem;height:3rem;"
              role="status">
 
             <span class="visually-hidden">
@@ -102,26 +110,23 @@
 
                 <div class="nav-item dropdown">
 
-				<a href="#"
-				   class="nav-link dropdown-toggle active d-flex align-items-center"
-				   data-bs-toggle="dropdown"
-				   aria-expanded="false">
+                    <a href="#"
+                       class="nav-link dropdown-toggle active d-flex align-items-center"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
 
-					<i class="fas fa-helmet-safety me-2"></i>
+                        <i class="fas fa-helmet-safety me-2"></i>
 
-					<span>
-						Servicios<br>
-						de Emergencia
-					</span>
+                        <span>
+                            Servicios<br>
+                            de Emergencia
+                        </span>
 
-				</a>
+                    </a>
 
                     <div class="dropdown-menu bg-transparent border-0">
 
-                        <!-- ==================================
-                             MAPA DE CALOR
-                        ================================== -->
-
+                        <!-- MAPA DE CALOR -->
                         <label class="dropdown-item">
 
                             <input type="checkbox"
@@ -132,10 +137,9 @@
                             Mapa de calor
 
                         </label>
-						
-						<!-- SEPARADOR -->
+
                         <div class="dropdown-divider"></div>
-						
+
                         <!-- ESTACIÓN 1 -->
                         <label class="dropdown-item">
 
@@ -210,6 +214,7 @@
                        class="nav-link">
 
                         <i class="fas fa-chart-bar me-2"></i>
+
                         Estadísticas
 
                     </a>
@@ -222,33 +227,47 @@
 
                 <div class="nav-item dropdown">
 
-					<a href="#"
-					   class="nav-link dropdown-toggle d-flex align-items-center"
-					   data-bs-toggle="dropdown"
-					   aria-expanded="false">
+                    <a href="#"
+                       class="nav-link dropdown-toggle d-flex align-items-center"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
 
-						<i class="fas fa-map me-2"></i>
+                        <i class="fas fa-map me-2"></i>
 
-						<span>
-							Información<br>
-							Geográfica
-						</span>
+                        <span>
+                            Información<br>
+                            Geográfica
+                        </span>
 
-					</a>
+                    </a>
 
                     <div class="dropdown-menu bg-transparent border-0">
 
-                        <a href="#" class="dropdown-item">
-                            Municipios
-                        </a>
+                        <!-- COLONIAS Y FRACCIONAMIENTOS -->
+                        <label class="dropdown-item"
+                               for="coloniasCheck">
 
-                        <a href="#" class="dropdown-item">
-                            Vegetación
-                        </a>
+                            <input type="checkbox"
+                                   id="coloniasCheck"
+                                   onchange="mostrarColonias(this.checked)">
 
-                        <a href="#" class="dropdown-item">
-                            Áreas protegidas
-                        </a>
+                            Colonias y fraccionamientos
+
+                        </label>
+
+                        <div class="dropdown-divider"></div>
+
+                        <!-- ÁREAS PRIORITARIAS -->
+                        <label class="dropdown-item"
+                               for="areasPrioritariasCheck">
+
+                            <input type="checkbox"
+                                   id="areasPrioritariasCheck"
+                                   onchange="mostrarAreasPrioritarias(this.checked)">
+
+                            Áreas prioritarias de incendios
+
+                        </label>
 
                     </div>
 
@@ -279,7 +298,7 @@
 
             </a>
 
-            <!-- MOSTRAR / OCULTAR SIDEBAR -->
+            <!-- SIDEBAR -->
             <a href="#"
                class="sidebar-toggler flex-shrink-0">
 
@@ -341,7 +360,7 @@
         </nav>
 
         <!-- ======================================
-             MAPA
+             MAPA LEAFLET
         ====================================== -->
 
         <div class="container-fluid">
@@ -367,12 +386,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="lib/chart/chart.min.js"></script>
+
 <script src="lib/easing/easing.min.js"></script>
+
 <script src="lib/waypoints/waypoints.min.js"></script>
+
 <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
 <script src="lib/tempusdominus/js/moment.min.js"></script>
+
 <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+
 <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
 
 <!-- ==========================================
@@ -388,19 +412,23 @@
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <!-- ==========================================
-     ARCHIVOS DEL VISOR
+     ARCHIVOS DEL VISOR CMMR
 ========================================== -->
 
+<!-- MAPA PRINCIPAL -->
 <script src="js/mapa.js"></script>
 
+<!-- COORDENADAS -->
 <script src="js/coordenadas.js"></script>
 
-<!-- ESTACIONES Y HEATMAP -->
+<!-- SERVICIOS DE EMERGENCIA -->
 <script src="js/servicios2.js"></script>
+
+<!-- DOS CAPAS GEOJSON EN UN SOLO JS -->
+<script src="js/informacion_geografica.js"></script>
 
 <!-- PLANTILLA -->
 <script src="js/main.js"></script>
 
 </body>
 </html>
-
