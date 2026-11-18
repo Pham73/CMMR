@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CMMR - Estadísticas</title>
+<link href="img/favicon.ico" rel="icon">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid position-relative d-flex p-0">
+ <div class="sidebar pe-4 pb-3"><nav class="navbar bg-secondary navbar-dark">
+  <a href="index.html" class="navbar-brand mx-4 mb-3"><img src="img/CMMR_logo.png" alt="CMMR" class="logo"></a>
+  <div class="navbar-nav w-100">
+   <a href="index.html" class="nav-item nav-link"><i class="fas fa-map-location-dot me-2"></i>Visor cartográfico</a>
+   <a href="estadisticas.html" class="nav-item nav-link active"><i class="fas fa-chart-bar me-2"></i>Estadísticas</a>
+  </div>
+ </nav></div>
+ <div class="content">
+  <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0"><a href="#" class="sidebar-toggler flex-shrink-0"><i class="fa fa-bars"></i></a><span class="ms-3 fw-bold">Centro Municipal de Monitoreo de Riesgo · Durango</span></nav>
+  <div class="container-fluid pt-4 px-4">
+   <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2"><h4 class="mb-0">Estadísticas de servicios de emergencia</h4><button class="btn btn-primary" id="actualizar"><i class="fa fa-rotate me-1"></i>Actualizar</button></div>
+   <div id="estado" class="alert alert-secondary" role="status">Preparando consulta...</div>
+   <div class="row g-3 mb-4">
+    <div class="col-md-3"><label for="anio" class="form-label">Año</label><select id="anio" class="form-select"><option value="">Todos</option></select></div>
+    <div class="col-md-3"><label for="estacion" class="form-label">Estación</label><select id="estacion" class="form-select"><option value="">Todas</option></select></div>
+    <div class="col-md-3"><label for="zona" class="form-label">Zona</label><select id="zona" class="form-select"><option value="">Todas</option></select></div>
+    <div class="col-md-3"><label for="prioridad" class="form-label">Prioridad</label><select id="prioridad" class="form-select"><option value="">Todas</option><option value="uno">Prioridad 1</option><option value="dos">Prioridad 2</option><option value="tres">Prioridad 3</option><option value="rural">Prioridad 1 rural</option></select></div>
+   </div>
+   <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Total de servicios</div><h3 id="total">—</h3></div></div>
+    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Estaciones con registros</div><h3 id="estaciones">—</h3></div></div>
+    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Zonas con registros</div><h3 id="zonas">—</h3></div></div>
+    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Prioridad 1</div><h3 id="p1">—</h3></div></div>
+   </div>
+   <div class="row g-4 mb-4">
+    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Servicios por estación</h6><div style="height:300px"><canvas id="graficaEstacion"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Servicios por mes</h6><div style="height:300px"><canvas id="graficaMes"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Servicios por zona</h6><div style="height:300px"><canvas id="graficaZona"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Registros con prioridad informada</h6><div style="height:300px"><canvas id="graficaPrioridad"></canvas></div><small class="text-muted">Las categorías pueden coincidir en un mismo registro; su suma puede superar el total de servicios.</small></div></div>
+   </div>
+  </div>
+ </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/estadisticas.js"></script>
+<script src="js/main.js"></script>
+</body></html>

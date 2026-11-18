@@ -205,23 +205,6 @@
                 </div>
 
                 <!-- ======================================
-                     ESTADÍSTICAS
-                ====================================== -->
-
-                <div class="nav-item">
-
-                    <a href="estadisticas.html"
-                       class="nav-link">
-
-                        <i class="fas fa-chart-bar me-2"></i>
-
-                        Estadísticas
-
-                    </a>
-
-                </div>
-
-                <!-- ======================================
                      INFORMACIÓN GEOGRÁFICA
                 ====================================== -->
 
@@ -241,35 +224,58 @@
 
                     </a>
 
-                    <div class="dropdown-menu bg-transparent border-0">
+                    
+				<div class="dropdown-menu bg-transparent border-0">
 
-                        <!-- COLONIAS Y FRACCIONAMIENTOS -->
-                        <label class="dropdown-item"
-                               for="coloniasCheck">
+					<!-- COLONIAS Y FRACCIONAMIENTOS -->
+					<label class="dropdown-item d-flex align-items-center gap-2"
+						   for="coloniasCheck">
 
-                            <input type="checkbox"
-                                   id="coloniasCheck"
-                                   onchange="mostrarColonias(this.checked)">
+						<input type="checkbox"
+							   id="coloniasCheck"
+							   onchange="mostrarColonias(this.checked)">
 
-                            Colonias y fraccionamientos
+						<span>
+							Colonias y <br>
+							Fraccionamientos
+						</span>
 
-                        </label>
+					</label>
 
-                        <div class="dropdown-divider"></div>
+					<!-- RIESGO DE INCENDIOS DE PASTIZALES -->
+					<label class="dropdown-item d-flex align-items-center gap-2"
+						   for="areasPrioritariasCheck">
 
-                        <!-- ÁREAS PRIORITARIAS -->
-                        <label class="dropdown-item"
-                               for="areasPrioritariasCheck">
+						<input type="checkbox"
+							   id="areasPrioritariasCheck"
+							   onchange="mostrarAreasPrioritarias(this.checked)">
 
-                            <input type="checkbox"
-                                   id="areasPrioritariasCheck"
-                                   onchange="mostrarAreasPrioritarias(this.checked)">
+						<span>
+							Riesgo de Incendios <br>
+							de Pastizales
+						</span>
 
-                            Áreas prioritarias de incendios
+					</label>
 
-                        </label>
+				</div>
 
-                    </div>
+
+                </div>
+
+                <!-- ======================================
+                     ESTADÍSTICAS
+                ====================================== -->
+
+                <div class="nav-item">
+
+                    <a href="estadisticas.html"
+                       class="nav-link">
+
+                        <i class="fas fa-chart-bar me-2"></i>
+
+                        Estadísticas
+
+                    </a>
 
                 </div>
 
