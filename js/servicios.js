@@ -1,16 +1,12 @@
 
 /* ==========================================================
-   CMMR - SERVICIOS Y MAPA DE CALOR
+   CMMR - SERVICIOS DE EMERGENCIA
+   SUPABASE + POSTGRESQL + LEAFLET
 
-   ARCHIVO: js/servicios.js
-   CSV: data/servicios.csv
+   FUENTE: public.servicios_mapa_publico
 
-   COORDENADAS:
    x = LONGITUD
    y = LATITUD
-
-   ESTACIONES:
-   ECO_1, ECO_2, ECO_3, ECO_4, ECO_5
 
    CONFIGURACIÓN INICIAL:
    - Estaciones desactivadas
@@ -18,88 +14,91 @@
    - Sin modificar centro ni zoom
 ========================================================== */
 
+// ==========================================================
+// 1. CONFIGURACIÓN SUPABASE
+// ==========================================================
+
+const SUPABASE_URL =
+    "https://quqpxsxwieqievqkccpn.supabase.co";
+
+const SUPABASE_PUBLIC_KEY =
+    "sb_publishable_ClvmTbRa6ursKGP0tnYgpw_9V9fe-nB";
+
+const SUPABASE_TABLA = "servicios_mapa_publico";
+
+const SUPABASE_PAGINA = 1000;
+
 
 // ==========================================================
-// 1. VARIABLES GLOBALES
+// 2. VARIABLES GLOBALES
 // ==========================================================
 
 var capasServicios = {};
-
 var datosServicios = null;
-
 var serviciosCargando = false;
-
 var capaCalor = null;
+var promesaServicios = null;
 
 
 // ==========================================================
-// 2. CAMPOS DEL POPUP
+// 3. CAMPOS DEL POPUP
 // ==========================================================
 
 var camposMostrar = [
-
-    "FECHA",
-    "SUBCOMANDANTE",
-    "NO_ESTACION",
-    "ZONA",
-    "SERVICIOS_PRIORIDAD_UNO",
-    "SERVICIOS_PRIORIDAD_DOS",
-    "SERVICIOS_PRIORIDAD_TRES",
-    "SERVICIOS_PRIORIDAD_UNO_ZONARURAL",
-    "LUGAR",
-    "UNIDAD_PARTICIPAN",
-    "PERSONAL_OPERATIVO",
-    "ESTACION_QUE_APOYA",
-    "CORPORACIONES_PARTICIPAN",
-    "NARRATIVA_HECHOS"
-
+    ["FECHA", "Fecha"],
+    ["SUBCOMANDANTE", "Subcomandante"],
+    ["NO_ESTACION", "Estación"],
+    ["TS", "Clave del servicio"],
+    ["tipo_servicio", "Tipo de servicio"],
+    ["prioridad_servicio", "Prioridad"],
+    ["zona_servicio", "Zona"],
+    ["HORA_SALIDA_UNIDAD", "Hora de salida"],
+    ["HORA_LLEGADA_UNIDAD", "Hora de llegada"],
+    ["TERMINO_SERVICIO", "Término del servicio"]
 ];
 
 
 // ==========================================================
-// 3. CREAR PANELES LEAFLET
+// 4. CREAR PANELES LEAFLET
 // ==========================================================
 
-// El mapa debe existir previamente en mapa.js.
-
-// Panel del Heatmap
 if (!map.getPane("panelCalor")) {
-
     map.createPane("panelCalor");
-
 }
 
 map.getPane("panelCalor").style.zIndex = 400;
-
 map.getPane("panelCalor").style.pointerEvents = "none";
 
-
-// Panel de los marcadores
 if (!map.getPane("panelServicios")) {
-
     map.createPane("panelServicios");
-
 }
 
 map.getPane("panelServicios").style.zIndex = 450;
 
 
 // ==========================================================
-// 4. OBTENER COORDENADAS
+// 5. OBTENER COORDENADAS
 // ==========================================================
 
 function obtenerCoordenadas(fila) {
 
-    var x = parseFloat(
-        String(fila.x ?? "")
-            .trim()
-            .replace(",", ".")
+    if (
+        fila.x === null ||
+        fila.y === null ||
+        fila.x === undefined ||
+        fila.y === undefined ||
+        fila.x === "" ||
+        fila.y === ""
+    ) {
+        return null;
+    }
+
+    var x = Number(
+        String(fila.x).trim().replace(",", ".")
     );
 
-    var y = parseFloat(
-        String(fila.y ?? "")
-            .trim()
-            .replace(",", ".")
+    var y = Number(
+        String(fila.y).trim().replace(",", ".")
     );
 
     if (
@@ -108,18 +107,15 @@ function obtenerCoordenadas(fila) {
         Math.abs(x) > 180 ||
         Math.abs(y) > 90
     ) {
-
         return null;
-
     }
 
     return [y, x];
-
 }
 
 
 // ==========================================================
-// 5. NORMALIZAR ESTACIÓN
+// 6. NORMALIZAR ESTACIÓN
 // ==========================================================
 
 function normalizarEstacion(valor) {
@@ -127,29 +123,174 @@ function normalizarEstacion(valor) {
     return String(valor ?? "")
         .trim()
         .toUpperCase()
-        .replace(/[\s-]+/g, "_");
-
+        .replace(/[\s_-]+/g, "");
 }
 
 
 // ==========================================================
-// 6. MOSTRAR / OCULTAR ESTACIONES
+// 7. CONSULTAR SUPABASE
+// ==========================================================
+
+async function consultarPaginaServicios(inicio) {
+
+    var url =
+        SUPABASE_URL +
+        "/rest/v1/" +
+        SUPABASE_TABLA +
+        "?select=*" +
+        "&order=FECHA.desc" +
+        "&offset=" + inicio +
+        "&limit=" + SUPABASE_PAGINA;
+
+    var respuesta = await fetch(url, {
+
+        method: "GET",
+
+        headers: {
+            "apikey": SUPABASE_PUBLIC_KEY,
+            "Accept": "application/json"
+        }
+
+    });
+
+    if (!respuesta.ok) {
+
+        var detalle = await respuesta.text();
+
+        throw new Error(
+            "Supabase HTTP " +
+            respuesta.status +
+            ": " + detalle
+        );
+    }
+
+    return await respuesta.json();
+}
+
+
+// ==========================================================
+// 8. CARGAR TODOS LOS SERVICIOS
+// ==========================================================
+
+async function cargarServicios() {
+
+    if (datosServicios !== null) {
+        return datosServicios;
+    }
+
+    if (promesaServicios) {
+        return promesaServicios;
+    }
+
+    serviciosCargando = true;
+
+    promesaServicios = (async function () {
+
+        var registros = [];
+        var inicio = 0;
+
+        while (true) {
+
+            var pagina =
+                await consultarPaginaServicios(inicio);
+
+            registros.push(...pagina);
+
+            if (pagina.length < SUPABASE_PAGINA) {
+                break;
+            }
+
+            inicio += SUPABASE_PAGINA;
+        }
+
+        datosServicios = registros;
+
+        console.log(
+            "Total de servicios cargados:",
+            datosServicios.length
+        );
+
+        actualizarCapasServicios();
+
+        return datosServicios;
+
+    })();
+
+    try {
+
+        return await promesaServicios;
+
+    } catch (error) {
+
+        datosServicios = null;
+
+        console.error(
+            "Error al consultar Supabase:",
+            error
+        );
+
+        throw error;
+
+    } finally {
+
+        serviciosCargando = false;
+        promesaServicios = null;
+    }
+}
+
+
+// ==========================================================
+// 9. ACTUALIZAR CAPAS ACTIVADAS
+// ==========================================================
+
+function actualizarCapasServicios() {
+
+    document.querySelectorAll(
+        'input[name="estaciones"]'
+    ).forEach(function (checkbox) {
+
+        var estacion =
+            normalizarEstacion("ECO_" + checkbox.value);
+
+        if (!capasServicios[estacion]) {
+            capasServicios[estacion] = L.layerGroup();
+        }
+
+        if (checkbox.checked) {
+
+            map.addLayer(capasServicios[estacion]);
+
+            dibujarEstacion(estacion);
+
+        } else {
+
+            map.removeLayer(capasServicios[estacion]);
+        }
+    });
+
+    var checkCalor =
+        document.getElementById("heatmap");
+
+    if (checkCalor && checkCalor.checked) {
+        mostrarHeatmap(true);
+    } else {
+        mostrarHeatmap(false);
+    }
+}
+
+
+// ==========================================================
+// 10. MOSTRAR / OCULTAR ESTACIONES
 // ==========================================================
 
 function mostrarServicios(checkbox) {
 
-    var estacion = "ECO_" + checkbox.value;
+    var estacion =
+        normalizarEstacion("ECO_" + checkbox.value);
 
-    // Crear capa independiente
     if (!capasServicios[estacion]) {
-
         capasServicios[estacion] = L.layerGroup();
-
     }
-
-    // ------------------------------------------------------
-    // OCULTAR ESTACIÓN
-    // ------------------------------------------------------
 
     if (!checkbox.checked) {
 
@@ -158,12 +299,7 @@ function mostrarServicios(checkbox) {
         console.log(estacion + " desactivada");
 
         return;
-
     }
-
-    // ------------------------------------------------------
-    // MOSTRAR ESTACIÓN
-    // ------------------------------------------------------
 
     map.addLayer(capasServicios[estacion]);
 
@@ -171,133 +307,17 @@ function mostrarServicios(checkbox) {
 
         dibujarEstacion(estacion);
 
-        return;
+    } else {
 
+        cargarServicios().catch(function (error) {
+            console.error(error);
+        });
     }
-
-    cargarServicios();
-
 }
 
 
 // ==========================================================
-// 7. CARGAR CSV
-// ==========================================================
-
-function cargarServicios() {
-
-    if (
-        serviciosCargando ||
-        datosServicios !== null
-    ) {
-
-        return;
-
-    }
-
-    serviciosCargando = true;
-
-    console.log("Cargando servicios.csv...");
-
-    Papa.parse("data/servicios.csv", {
-
-        download: true,
-
-        header: true,
-
-        skipEmptyLines: true,
-
-        delimiter: "",
-
-        transformHeader: function(header) {
-
-            return header
-                .replace(/^\uFEFF/, "")
-                .trim();
-
-        },
-
-        complete: function(resultado) {
-
-            serviciosCargando = false;
-
-            if (resultado.errors.length > 0) {
-
-                console.warn(
-                    "Advertencias del CSV:",
-                    resultado.errors
-                );
-
-            }
-
-            datosServicios = resultado.data;
-
-            console.log(
-                "Columnas:",
-                resultado.meta.fields
-            );
-
-            console.log(
-                "Total de registros:",
-                datosServicios.length
-            );
-
-            // ----------------------------------------------
-            // ESTACIONES ACTIVADAS
-            // ----------------------------------------------
-
-            document.querySelectorAll(
-                'input[name="estaciones"]:checked'
-            ).forEach(function(checkbox) {
-
-                var estacion = "ECO_" + checkbox.value;
-
-                if (!capasServicios[estacion]) {
-
-                    capasServicios[estacion] =
-                        L.layerGroup();
-
-                }
-
-                map.addLayer(capasServicios[estacion]);
-
-                dibujarEstacion(estacion);
-
-            });
-
-            // ----------------------------------------------
-            // MAPA DE CALOR
-            // ----------------------------------------------
-
-            var checkCalor =
-                document.getElementById("heatmap");
-
-            if (checkCalor && checkCalor.checked) {
-
-                mostrarHeatmap(true);
-
-            }
-
-        },
-
-        error: function(error) {
-
-            serviciosCargando = false;
-
-            console.error(
-                "Error al cargar CSV:",
-                error
-            );
-
-        }
-
-    });
-
-}
-
-
-// ==========================================================
-// 8. DIBUJAR ESTACIÓN
+// 11. DIBUJAR ESTACIÓN
 // ==========================================================
 
 function dibujarEstacion(estacionSeleccionada) {
@@ -312,31 +332,18 @@ function dibujarEstacion(estacionSeleccionada) {
 
     var contador = 0;
 
-    datosServicios.forEach(function(fila) {
+    datosServicios.forEach(function (fila) {
 
-        // ----------------------------------------------
-        // FILTRAR ESTACIÓN
-        // ----------------------------------------------
-
-        var estacion = normalizarEstacion(
-            fila.NO_ESTACION
-        );
+        var estacion =
+            normalizarEstacion(fila.NO_ESTACION);
 
         if (estacion !== estacionSeleccionada) {
             return;
         }
 
-        // ----------------------------------------------
-        // COORDENADAS
-        // ----------------------------------------------
-
         var coordenadas = obtenerCoordenadas(fila);
 
         if (!coordenadas) return;
-
-        // ----------------------------------------------
-        // MARCADOR
-        // ----------------------------------------------
 
         var marcador = L.circleMarker(
             coordenadas,
@@ -355,8 +362,8 @@ function dibujarEstacion(estacionSeleccionada) {
 
         popup.className = "popup-servicios";
 
-        // ENCABEZADO
-        var encabezado = document.createElement("div");
+        var encabezado =
+            document.createElement("div");
 
         encabezado.className = "popup-encabezado";
 
@@ -365,18 +372,17 @@ function dibujarEstacion(estacionSeleccionada) {
 
         popup.appendChild(encabezado);
 
-        // CONTENIDO
-        var contenido = document.createElement("div");
+        var contenido =
+            document.createElement("div");
 
         contenido.className = "popup-contenido";
 
-        // ----------------------------------------------
-        // CAMPOS
-        // ----------------------------------------------
+        camposMostrar.forEach(function (campo) {
 
-        camposMostrar.forEach(function(campo) {
+            var nombreCampo = campo[0];
+            var etiquetaCampo = campo[1];
 
-            var valor = fila[campo];
+            var valor = fila[nombreCampo];
 
             if (
                 valor === undefined ||
@@ -386,43 +392,50 @@ function dibujarEstacion(estacionSeleccionada) {
                 return;
             }
 
-            var linea = document.createElement("div");
+            var linea =
+                document.createElement("div");
 
             linea.className = "popup-fila";
 
-            var etiqueta = document.createElement("strong");
+            var etiqueta =
+                document.createElement("strong");
 
             etiqueta.className = "popup-etiqueta";
 
             etiqueta.textContent =
-                campo.replace(/_/g, " ") + ":";
+                etiquetaCampo + ": ";
 
-            var dato = document.createElement("span");
+            var dato =
+                document.createElement("span");
 
             dato.className = "popup-valor";
 
-            dato.textContent = String(valor);
+            if (nombreCampo === "FECHA") {
+
+                var fecha = new Date(valor);
+
+                dato.textContent =
+                    Number.isNaN(fecha.getTime())
+                        ? String(valor)
+                        : fecha.toLocaleString("es-MX");
+
+            } else {
+
+                dato.textContent = String(valor);
+            }
 
             linea.appendChild(etiqueta);
-
             linea.appendChild(dato);
 
             contenido.appendChild(linea);
-
         });
 
         popup.appendChild(contenido);
 
-        // ----------------------------------------------
-        // CONFIGURAR POPUP
-        // ----------------------------------------------
-
         marcador.bindPopup(popup, {
 
             className: "popup-cmmr",
-
             autoPan: true,
-
             keepInView: true
 
         });
@@ -430,7 +443,6 @@ function dibujarEstacion(estacionSeleccionada) {
         marcador.addTo(capa);
 
         contador++;
-
     });
 
     console.log(
@@ -438,39 +450,27 @@ function dibujarEstacion(estacionSeleccionada) {
         " - Servicios: " +
         contador
     );
-
 }
 
 
 // ==========================================================
-// 9. MOSTRAR / OCULTAR MAPA DE CALOR
+// 12. MOSTRAR / OCULTAR MAPA DE CALOR
 // ==========================================================
 
 function mostrarHeatmap(activar) {
-
-    // ------------------------------------------------------
-    // DESACTIVAR
-    // ------------------------------------------------------
 
     if (!activar) {
 
         if (capaCalor) {
 
             map.removeLayer(capaCalor);
-
             capaCalor = null;
-
         }
 
         console.log("Mapa de calor desactivado");
 
         return;
-
     }
-
-    // ------------------------------------------------------
-    // VERIFICAR BIBLIOTECA
-    // ------------------------------------------------------
 
     if (typeof L.heatLayer !== "function") {
 
@@ -479,28 +479,20 @@ function mostrarHeatmap(activar) {
         );
 
         return;
-
     }
-
-    // ------------------------------------------------------
-    // VERIFICAR DATOS
-    // ------------------------------------------------------
 
     if (datosServicios === null) {
 
-        cargarServicios();
+        cargarServicios().catch(function (error) {
+            console.error(error);
+        });
 
         return;
-
     }
-
-    // ------------------------------------------------------
-    // GENERAR PUNTOS
-    // ------------------------------------------------------
 
     var puntosCalor = [];
 
-    datosServicios.forEach(function(fila) {
+    datosServicios.forEach(function (fila) {
 
         var coordenadas = obtenerCoordenadas(fila);
 
@@ -511,7 +503,6 @@ function mostrarHeatmap(activar) {
             coordenadas[1],
             1
         ]);
-
     });
 
     console.log(
@@ -519,31 +510,15 @@ function mostrarHeatmap(activar) {
         puntosCalor.length
     );
 
-    if (puntosCalor.length === 0) {
-
-        console.warn(
-            "No existen coordenadas válidas."
-        );
-
-        return;
-
-    }
-
-    // ------------------------------------------------------
-    // ELIMINAR CAPA ANTERIOR
-    // ------------------------------------------------------
-
     if (capaCalor) {
 
         map.removeLayer(capaCalor);
-
         capaCalor = null;
-
     }
 
-    // ------------------------------------------------------
-    // CREAR NUEVA CAPA
-    // ------------------------------------------------------
+    if (puntosCalor.length === 0) {
+        return;
+    }
 
     capaCalor = L.heatLayer(puntosCalor, {
 
@@ -560,61 +535,50 @@ function mostrarHeatmap(activar) {
         gradient: {
 
             0.2: "blue",
-
             0.4: "cyan",
-
             0.6: "lime",
-
             0.8: "yellow",
-
             1.0: "red"
-
         }
-
     });
-
-    // ------------------------------------------------------
-    // MOSTRAR CAPA
-    // ------------------------------------------------------
 
     capaCalor.addTo(map);
 
-    // Solicitar redibujado
     if (typeof capaCalor.redraw === "function") {
-
         capaCalor.redraw();
-
     }
 
-    console.log(
-        "Mapa de calor activado correctamente"
-    );
-
-    // No se utiliza fitBounds ni setView.
-
+    // No modificar centro ni zoom.
 }
 
 
 // ==========================================================
-// 10. CONFIGURACIÓN INICIAL
+// 13. RECARGAR DATOS DESDE SUPABASE
 // ==========================================================
 
-// ----------------------------------------------
-// ESTACIONES DESACTIVADAS
-// ----------------------------------------------
+async function recargarServicios() {
+
+    datosServicios = null;
+
+    return await cargarServicios();
+}
+
+
+// ==========================================================
+// 14. CONFIGURACIÓN INICIAL
+// ==========================================================
+
+// Estaciones desactivadas inicialmente.
 
 document.querySelectorAll(
     'input[name="estaciones"]'
-).forEach(function(checkbox) {
+).forEach(function (checkbox) {
 
     checkbox.checked = false;
-
 });
 
 
-// ----------------------------------------------
-// MAPA DE CALOR ACTIVADO
-// ----------------------------------------------
+// Mapa de calor activado inicialmente.
 
 var checkCalorInicial =
     document.getElementById("heatmap");
@@ -622,15 +586,18 @@ var checkCalorInicial =
 if (checkCalorInicial) {
 
     checkCalorInicial.checked = true;
-
 }
 
 
-// ----------------------------------------------
-// CARGAR CSV
-// ----------------------------------------------
+// Cargar servicios desde Supabase.
 
-cargarServicios();
+cargarServicios().catch(function (error) {
+
+    console.error(
+        "No fue posible cargar los servicios:",
+        error
+    );
+});
 
 
 // ==========================================================

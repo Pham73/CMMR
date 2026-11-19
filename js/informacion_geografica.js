@@ -52,22 +52,29 @@ var informacionGeograficaIniciada = false;
 function configurarPanelesCMMR() {
 
     const paneles = {
-        paneCalor: 350,
+        panelCalor: 350,
         paneIncendios: 410,
         paneColonias: 450,
-        paneEstaciones: 460
+        panelServicios: 500
     };
 
     Object.entries(paneles).forEach(([nombre, z]) => {
+
         if (!map.getPane(nombre)) {
             map.createPane(nombre);
         }
+
         map.getPane(nombre).style.zIndex = z;
     });
 
-    map.getPane("paneCalor").style.pointerEvents = "none";
+    map.getPane("panelCalor").style.pointerEvents = "none";
+
     map.getPane("paneIncendios").style.pointerEvents = "auto";
+
     map.getPane("paneColonias").style.pointerEvents = "auto";
+
+    map.getPane("panelServicios").style.pointerEvents = "auto";
+}
 }
 
 // 3. SEGURIDAD HTML
