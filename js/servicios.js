@@ -41,14 +41,14 @@ var promesaServicios = null;
 
 
 // ==========================================================
-// 3. CAMPOS DEL POPUP
+// 3. CAMPOS DEL POPUP - SERVICIOS DE EMERGENCIA
 // ==========================================================
 
 var camposMostrar = [
     ["FECHA", "Fecha"],
     ["SUBCOMANDANTE", "Subcomandante"],
     ["NO_ESTACION", "Estación"],
-    ["TS", "Clave del servicio"],
+    ["TS", "Clave TS"],
     ["tipo_servicio", "Tipo de servicio"],
     ["prioridad_servicio", "Prioridad"],
     ["zona_servicio", "Zona"],
