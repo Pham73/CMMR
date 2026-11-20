@@ -45,7 +45,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Estilos CMMR -->
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/style.css?v=2" rel="stylesheet">
 
     <!-- Leaflet -->
     <link rel="stylesheet"
@@ -297,221 +297,39 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 'use strict';
-// CONFIGURACIÓN: reemplaza únicamente la clave pública.
+// Clave pública de Supabase (no utilizar service_role en el navegador).
 const SUPABASE_URL = 'https://quqpxsxwieqievqkccpn.supabase.co';
 const SUPABASE_PUBLIC_KEY = 'sb_publishable_ClvmTbRa6ursKGP0tnYgpw_9V9fe-nB';
-const TABLA = 'servicios_emergencia';
+const TABLA = 'servicios';
 const $ = id => document.getElementById(id);
 const resultado = $('resultado');
-const CATALOGO_SERVICIOS = [
- [
-  {
-   "codigo": "TS 1",
-   "descripcion": "INCENDIO EN TANQUES O CILINDROS DE GAS L.P."
-  },
-  {
-   "codigo": "TS 2",
-   "descripcion": "INCENDIOS EN EDIFICACIONES INDUSTRIALES"
-  },
-  {
-   "codigo": "TS 3",
-   "descripcion": "INCENDIOS EN EDIFICACIONES COMERCIALES"
-  },
-  {
-   "codigo": "TS 4",
-   "descripcion": "INCENDIO DE RELLENO SANITARIO"
-  },
-  {
-   "codigo": "TS 5",
-   "descripcion": "INCENDIOS EN VIVIENDAS DE MATS. FRÁGILES"
-  },
-  {
-   "codigo": "TS 6",
-   "descripcion": "INCENDIOS EN CASA HABITACIÓN"
-  },
-  {
-   "codigo": "TS 7",
-   "descripcion": "INCENDIOS EN VEHÍCULOS"
-  },
-  {
-   "codigo": "TS 8",
-   "descripcion": "INCENDIOS DE ÁRBOLES O POSTES EN VÍA PÚBLICA"
-  },
-  {
-   "codigo": "TS 9",
-   "descripcion": "INCENDIOS EN LOTES BALDÍOS Y/O ZACATALES URBANOS"
-  },
-  {
-   "codigo": "TS 10",
-   "descripcion": "FUGAS DE GAS L.P. EN TANQUES ESTACIONARIOS O CILINDROS"
-  },
-  {
-   "codigo": "TS 11",
-   "descripcion": "RESCATE DE PERSONAS EN ACCIDENTES"
-  },
-  {
-   "codigo": "TS 12",
-   "descripcion": "ATENCIÓN PREHOSPITALARIA"
-  },
-  {
-   "codigo": "TS 13",
-   "descripcion": "APOYO EN ACCIDENTES DE TRÁNSITO"
-  },
-  {
-   "codigo": "TS 14",
-   "descripcion": "CONTROL DE DERRAMES DE COMBUSTIBLES Y MAT. PELIGROSOS"
-  },
-  {
-   "codigo": "TS 15",
-   "descripcion": "INCENDIOS EN TLAZOLERAS Y/O ZACATALES RURALES"
-  },
-  {
-   "codigo": "TS 16",
-   "descripcion": "ATENCIÓN A REPORTES DE OLOR A COMBUSTIBLES"
-  }
- ],
- [
-  {
-   "codigo": "TS 17",
-   "descripcion": "RECUPERACIÓN DE CADÁVERES EN PRESAS, LAGOS Y RÍOS"
-  },
-  {
-   "codigo": "TS 18",
-   "descripcion": "CAPTURA DE ANIMALES"
-  },
-  {
-   "codigo": "TS 19",
-   "descripcion": "CAPTURA O TRASLADO DE ENJAMBRES DE ABEJAS"
-  },
-  {
-   "codigo": "TS 20",
-   "descripcion": "RETIRAR ÁRBOLES, CABLES, POSTES O ANUNCIOS"
-  },
-  {
-   "codigo": "TS 21",
-   "descripcion": "ATENCIÓN EN INUNDACIONES"
-  }
- ],
- [
-  {
-   "codigo": "TS 22",
-   "descripcion": "APOYO EN OPERATIVOS ESPECIALES"
-  },
-  {
-   "codigo": "TS 23",
-   "descripcion": "TRASLADO DE INDIGENTES O DAMNIFICADOS"
-  },
-  {
-   "codigo": "TS 24",
-   "descripcion": "SERVICIO SOCIAL"
-  },
-  {
-   "codigo": "TS 25",
-   "descripcion": "INSPECCIÓN DE VIVIENDAS"
-  },
-  {
-   "codigo": "TS 26",
-   "descripcion": "RECORRIDO"
-  },
-  {
-   "codigo": "TS 27",
-   "descripcion": "LIMPIEZA DE ALCANTARILLAS"
-  },
-  {
-   "codigo": "TS 28",
-   "descripcion": "INSPECCIÓN DE QUEMA DE PÓLVORA"
-  },
-  {
-   "codigo": "TS 29",
-   "descripcion": "FALSA ALARMA"
-  }
- ],
- [
-  {
-   "codigo": "TS 30",
-   "descripcion": "INCENDIO EN TANQUES O CILINDROS DE GAS L.P."
-  },
-  {
-   "codigo": "TS 31",
-   "descripcion": "INCENDIOS EN EDIFICACIONES INDUSTRIALES"
-  },
-  {
-   "codigo": "TS 32",
-   "descripcion": "INCENDIOS EN EDIFICACIONES COMERCIALES"
-  },
-  {
-   "codigo": "TS 33",
-   "descripcion": "INCENDIO DE RELLENO SANITARIO"
-  },
-  {
-   "codigo": "TS 34",
-   "descripcion": "INCENDIOS EN VIVIENDAS DE MATS. FRÁGILES"
-  },
-  {
-   "codigo": "TS 35",
-   "descripcion": "INCENDIOS EN CASA HABITACIÓN"
-  },
-  {
-   "codigo": "TS 36",
-   "descripcion": "INCENDIOS EN VEHÍCULOS"
-  },
-  {
-   "codigo": "TS 37",
-   "descripcion": "INCENDIOS DE ÁRBOLES O POSTES EN VÍA PÚBLICA"
-  },
-  {
-   "codigo": "TS 38",
-   "descripcion": "INCENDIOS EN LOTES BALDÍOS Y/O ZACATALES"
-  },
-  {
-   "codigo": "TS 39",
-   "descripcion": "FUGAS DE GAS L.P. EN TANQUES ESTACIONARIOS O CILINDROS"
-  },
-  {
-   "codigo": "TS 40",
-   "descripcion": "RESCATE DE PERSONAS EN ACCIDENTES"
-  },
-  {
-   "codigo": "TS 41",
-   "descripcion": "ATENCIÓN PREHOSPITALARIA"
-  },
-  {
-   "codigo": "TS 42",
-   "descripcion": "APOYO EN ACCIDENTES DE TRÁNSITO"
-  },
-  {
-   "codigo": "TS 43",
-   "descripcion": "CONTROL DE DERRAMES DE COMBUSTIBLES Y MAT. PELIGROSOS"
-  },
-  {
-   "codigo": "TS 44",
-   "descripcion": "ATENCIÓN A REPORTES DE OLOR A COMBUSTIBLES"
-  }
- ]
-];
+// Catálogo consultado en tiempo real desde public.tipos_servicio.
+let catalogoTS = [];
+let catalogoListo = false;
 const campos = [
- ['FECHA','Fecha y hora','datetime-local',true],
+ ['FECHA','Fecha','date',true],
  ['SUBCOMANDANTE','Subcomandante','text'],
- ['NO_ESTACION','Estación','select',true,['ECO_1','ECO_2','ECO_3','ECO_4','ECO_5']],
+ ['NO_ESTACION','Estación','select',true,['ECO 1','ECO 2','ECO 3','ECO 4','ECO 5']],
  ['ZONA','Zona','select',true,['URBANA','RURAL']],
- ['SERVICIOS_PRIORIDAD_UNO','Servicio prioridad uno','select',false,CATALOGO_SERVICIOS[0]],
- ['SERVICIOS_PRIORIDAD_DOS','Servicio prioridad dos','select',false,CATALOGO_SERVICIOS[1]],
- ['SERVICIOS_PRIORIDAD_TRES','Servicio prioridad tres','select',false,CATALOGO_SERVICIOS[2]],
- ['SERVICIOS_PRIORIDAD_UNO_ZONARURAL','Servicio prioridad uno zona rural','select',false,CATALOGO_SERVICIOS[3]],
+ ['TS_P1','Servicios prioridad uno · urbana','select',false,[]],
+ ['TS_P2','Servicios prioridad dos · urbana','select',false,[]],
+ ['TS_P3','Servicios prioridad tres · urbana','select',false,[]],
+ ['TS_P4','Servicios prioridad uno · rural','select',false,[]],
  ['HORA_SALIDA_UNIDAD','Hora salida de unidad','time'],
  ['HORA_LLEGADA_UNIDAD','Hora llegada de unidad','time'],
  ['TERMINO_SERVICIO','Término del servicio','time'],
  ['NOMBRE_REPORTANTE','Nombre del reportante','text'],
  ['TELEFONO','Teléfono','tel'],
- ['LUGAR','Lugar','text',true],
+ ['CALLE','Calle','text'],
+ ['COLONIA','Colonia','text'],
+ ['ENTRECALLES','Entrecalles','text'],
  ['UNIDAD_PARTICIPAN','Unidades participantes','text'],
  ['PERSONAL_OPERATIVO','Personal operativo','textarea'],
  ['ESTACION_QUE_APOYA','Estación que apoya','text'],
  ['CORPORACIONES_PARTICIPAN','Corporaciones participantes','textarea'],
  ['NARRATIVA_HECHOS','Narrativa de los hechos','textarea'],
  ['CORPORACIONES','Corporaciones','text'],
- ['CAPTURA_REGISTRO','Captura del registro','text'],
- ['COLONIA_ENTRECALLES','Colonia y entrecalles','text']
+ ['CAPTURA_REGISTRO','Captura del registro','text']
 ];
 for (const [nombre,etiqueta,tipo,obligatorio,opciones] of campos) {
  const col=document.createElement('div');col.className=(tipo==='textarea'?'col-12':'col-md-6');
@@ -533,16 +351,76 @@ for (const [nombre,etiqueta,tipo,obligatorio,opciones] of campos) {
  else {control=document.createElement('input');control.type=tipo;}
  control.id=nombre;control.name=nombre;if(nombre==='NO_ESTACION')control.disabled=true;control.className='form-control'+(tipo==='select'?' form-select':'');control.required=Boolean(obligatorio);col.appendChild(control);$('camposFormulario').appendChild(col);
 }
-// Zona independiente. Cada servicio se almacena en su columna de prioridad.
-// Si se selecciona una categoría, se limpian las otras tres para evitar duplicidad.
-const CAMPOS_SERVICIO = [
- 'SERVICIOS_PRIORIDAD_UNO','SERVICIOS_PRIORIDAD_DOS',
- 'SERVICIOS_PRIORIDAD_TRES','SERVICIOS_PRIORIDAD_UNO_ZONARURAL'
+// El catálogo se consulta directamente en public.tipos_servicio.
+const detalleTS=document.createElement('div');
+detalleTS.className='col-12';
+detalleTS.innerHTML='<div class="alert alert-light border mb-0" role="status"><strong>Servicio seleccionado:</strong> <span id="textoTS">Selecciona una zona y un TS.</span></div>';
+$('camposFormulario').appendChild(detalleTS);
+const estadoCatalogoTS=document.createElement('div');
+estadoCatalogoTS.id='estadoCatalogoTS';
+estadoCatalogoTS.className='col-12 small-help';
+estadoCatalogoTS.textContent='Cargando catálogo TS desde Supabase...';
+$('camposFormulario').appendChild(estadoCatalogoTS);
+const SELECTORES_TS = [
+ {id:'TS_P1',prioridad:1,zona:'URBANA'},
+ {id:'TS_P2',prioridad:2,zona:'URBANA'},
+ {id:'TS_P3',prioridad:3,zona:'URBANA'},
+ {id:'TS_P4',prioridad:4,zona:'RURAL'}
 ];
-for(const nombre of CAMPOS_SERVICIO){
- $(nombre).addEventListener('change',()=>{
-  if(!$(nombre).value)return;
-  for(const otro of CAMPOS_SERVICIO){if(otro!==nombre)$(otro).value='';}
+function obtenerTSSeleccionado(){
+ for(const grupo of SELECTORES_TS){
+  const codigo=$(grupo.id).value;
+  if(codigo)return catalogoTS.find(t=>t.ts===codigo && t.prioridad===grupo.prioridad && t.zona===grupo.zona)||null;
+ }
+ return null;
+}
+function actualizarDescripcionTS(){
+ const item=obtenerTSSeleccionado();
+ $('textoTS').textContent=item?`${item.ts} — ${item.servicios}`:'Selecciona una zona y un servicio por prioridad.';
+}
+function actualizarOpcionesTS(){
+ const zona=$('ZONA').value;
+ for(const grupo of SELECTORES_TS){
+  const control=$(grupo.id), previo=control.value;
+  control.replaceChildren(new Option('Seleccionar tipo de servicio',''));
+  const habilitado=catalogoListo && zona===grupo.zona;
+  control.disabled=!habilitado;
+  if(habilitado){
+   const lista=catalogoTS.filter(t=>t.zona===grupo.zona && t.prioridad===grupo.prioridad);
+   for(const item of lista)control.add(new Option(`${item.ts} - ${item.servicios}`,item.ts));
+   if(lista.some(t=>t.ts===previo))control.value=previo;
+  }
+ }
+ if(catalogoListo){
+  const disponibles=catalogoTS.filter(t=>t.zona===zona).length;
+  $('estadoCatalogoTS').textContent=zona?`Zona ${zona}: ${disponibles} servicios disponibles, agrupados por prioridad.`:`Catálogo TS: ${catalogoTS.length} servicios cargados. Selecciona la zona.`;
+ }
+ actualizarDescripcionTS();
+}
+async function cargarCatalogoTS(){
+ catalogoListo=false;
+ actualizarOpcionesTS();
+ if(!cliente)return;
+ const {data,error}=await cliente.from('tipos_servicio')
+  .select('ts,servicios,prioridad,zona').order('prioridad',{ascending:true}).order('ts',{ascending:true});
+ if(error){
+  $('estadoCatalogoTS').textContent='No se pudo cargar el catálogo TS.';
+  mostrar('Error al cargar TS: '+error.message,'danger');
+  return;
+ }
+ catalogoTS=(data||[]).map(t=>({
+  ts:String(t.ts||'').trim(),servicios:String(t.servicios||'').trim(),
+  prioridad:Number(t.prioridad),zona:String(t.zona||'').trim().toUpperCase()
+ }));
+ catalogoListo=true;
+ actualizarOpcionesTS();
+ if(!catalogoTS.length)mostrar('No se recibieron servicios TS. Revisa permisos RLS.','warning');
+}
+$('ZONA').addEventListener('change',actualizarOpcionesTS);
+for(const grupo of SELECTORES_TS){
+ $(grupo.id).addEventListener('change',()=>{
+  if($(grupo.id).value){for(const otro of SELECTORES_TS)if(otro.id!==grupo.id)$(otro.id).value='';}
+  actualizarDescripcionTS();
  });
 }
 // Leaflet: mapa independiente del mapa principal de CMMR.
@@ -607,10 +485,11 @@ try {
 }catch(e){$('sesionEstado').textContent=e.message;mostrar(e.message,'warning');}
 let perfilActual = null;
 let sesionVersion = 0;
+if(cliente)cargarCatalogoTS();
 function aplicarEstacion(){
  const selector=$('NO_ESTACION');
  if(!perfilActual){selector.value='';selector.disabled=true;return;}
- const esAdmin=perfilActual.rol==='ADMIN' && perfilActual.estacion==='ADMIN';
+ const esAdmin=perfilActual.rol==='ADMIN' && perfilActual.estacion==='CMMR';
  selector.disabled=!esAdmin;
  if(!esAdmin)selector.value=perfilActual.estacion;
 }
@@ -681,12 +560,16 @@ $('formServicio').addEventListener('submit',async e=>{
  const {data:{user},error:authError}=await cliente.auth.getUser();
  if(authError||!user||!perfilActual){mostrar('Inicia sesión con un usuario autorizado antes de guardar','warning');return;}
  aplicarEstacion();
+ if(!catalogoListo){mostrar('El catálogo TS no está disponible.','warning');return;}
  if(!$('formServicio').reportValidity())return;
+ const tipoSeleccionado=obtenerTSSeleccionado();
+ if(!tipoSeleccionado || tipoSeleccionado.zona!==$('ZONA').value){mostrar('Selecciona un TS válido para la zona y prioridad.','warning');return;}
  if(perfilActual.rol!=='ADMIN' && $('NO_ESTACION').value!==perfilActual.estacion){mostrar('Estación no autorizada','danger');return;}
  const lat=Number($('y').value),lng=Number($('x').value);
  if($('x').value===''||$('y').value===''||!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180){mostrar('Coordenadas inválidas','danger');return;}
  const registro={x:lng,y:lat};
- for(const [nombre,,tipo] of campos){let valor=$(nombre).value.trim();if(!valor)continue;if(tipo==='datetime-local')valor=valor.replace('T',' ')+':00';registro[nombre]=valor;}
+ for(const [nombre] of campos){if(nombre==='ZONA'||nombre.startsWith('TS_P'))continue;const valor=$(nombre).value.trim();if(valor)registro[nombre]=valor;}
+ registro.TS=tipoSeleccionado.ts;
  if(perfilActual.rol!=='ADMIN')registro.NO_ESTACION=perfilActual.estacion;
  $('guardar').disabled=true;
  try{
@@ -694,15 +577,15 @@ $('formServicio').addEventListener('submit',async e=>{
   const {error}=await cliente.from(TABLA).insert(registro);
   if(error)throw error;
   mostrar('Servicio registrado correctamente','success');
-  $('formServicio').reset();$('FECHA').value=fechaLocal();fijarCoordenadas(24.0277,-104.6532,true);aplicarEstacion();
+  $('formServicio').reset();$('FECHA').value=fechaLocal();fijarCoordenadas(24.0277,-104.6532,true);aplicarEstacion();actualizarOpcionesTS();
  }catch(error){mostrar('No se pudo guardar: '+error.message,'danger');console.error(error);}
  finally{await actualizarSesion();}
 });
-$('formServicio').addEventListener('reset',()=>{setTimeout(()=>{$('FECHA').value=fechaLocal();fijarCoordenadas(24.0277,-104.6532,true);aplicarEstacion();},0);});
+$('formServicio').addEventListener('reset',()=>{setTimeout(()=>{$('FECHA').value=fechaLocal();fijarCoordenadas(24.0277,-104.6532,true);aplicarEstacion();actualizarOpcionesTS();},0);});
 
 </script>
 <!-- PLANTILLA -->
-<script src="js/main.js"></script>
+<script src="js/main.js?v=2"></script>
 
 </body>
 </html>

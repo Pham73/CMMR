@@ -1,52 +1,474 @@
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CMMR - Estadísticas</title>
-<link href="img/favicon.ico" rel="icon">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
-<link href="css/bootstrap.min.css" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CMMR | Estadísticas por TS</title>
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Iconos -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap y estilos CMMR -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        /* ==========================================
+           TABLA DE ESTADÍSTICAS
+        ========================================== */
+
+        .tabla-contenedor {
+            overflow: auto;
+            max-height: 75vh;
+            background: white;
+            border: 1px solid #d5dce3;
+            border-radius: 6px;
+        }
+
+        #tablaTS {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 11px;
+            min-width: 1250px;
+            width: 100%;
+            color: #20252a;
+        }
+
+        #tablaTS th,
+        #tablaTS td {
+            border-right: 1px solid #bdc5cc;
+            border-bottom: 1px solid #bdc5cc;
+            padding: 5px 3px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Encabezado fijo */
+        #tablaTS thead th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: #e9edf2;
+            color: #222;
+        }
+
+        /* Columna TS */
+        #tablaTS .codigo {
+            min-width: 55px;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            font-weight: 600;
+        }
+
+        /* Descripción del servicio */
+        #tablaTS .descripcion {
+            text-align: left;
+            min-width: 360px;
+            max-width: 480px;
+            white-space: normal;
+            position: sticky;
+            left: 55px;
+            z-index: 1;
+        }
+
+        /* ==========================================
+           COLORES POR PRIORIDAD
+        ========================================== */
+
+        /* Prioridad 1 urbana */
+        #tablaTS .grupo-1 td {
+            background: #f4c4c4;
+        }
+
+        /* Prioridad 2 urbana */
+        #tablaTS .grupo-2 td {
+            background: #ffeaa2;
+        }
+
+        /* Prioridad 3 urbana */
+        #tablaTS .grupo-3 td {
+            background: #bce6c7;
+        }
+
+        /* Prioridad 1 rural */
+        #tablaTS .grupo-4 td {
+            background: #e4e5e7;
+        }
+
+        /* Subtotales */
+        #tablaTS .subtotal td {
+            font-weight: 700;
+            background: #e7edf3 !important;
+        }
+
+        /* Total general */
+        #tablaTS .gran-total td {
+            font-weight: 700;
+            background: #cbd8e6 !important;
+        }
+
+        /* Días inexistentes */
+        #tablaTS .fuera-mes {
+            background: #f1f2f4 !important;
+            color: #a1a8b0;
+        }
+
+        /* Valores numéricos */
+        #tablaTS .numero {
+            font-variant-numeric: tabular-nums;
+            min-width: 23px;
+        }
+
+        /* ==========================================
+           IMPRESIÓN
+        ========================================== */
+
+        @media print {
+
+            .sidebar,
+            .sticky-top,
+            .no-imprimir,
+            #estado {
+                display: none !important;
+            }
+
+            .content {
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .tabla-contenedor {
+                max-height: none;
+                overflow: visible;
+                border: 0;
+            }
+
+            #tablaTS {
+                font-size: 8px;
+                min-width: 0;
+            }
+
+            #tablaTS th,
+            #tablaTS td {
+                padding: 2px 1px;
+            }
+
+            #tablaTS .descripcion {
+                min-width: 230px;
+                max-width: 230px;
+            }
+
+            body {
+                background: white !important;
+            }
+
+            @page {
+                size: landscape;
+                margin: 7mm;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
 <div class="container-fluid position-relative d-flex p-0">
- <div class="sidebar pe-4 pb-3"><nav class="navbar bg-secondary navbar-dark">
-  <a href="index.html" class="navbar-brand mx-4 mb-3"><img src="img/CMMR_logo.png" alt="CMMR" class="logo"></a>
-  <div class="navbar-nav w-100">
-   <a href="index.html" class="nav-item nav-link"><i class="fas fa-map-location-dot me-2"></i>Visor cartográfico</a>
-   <a href="estadisticas.html" class="nav-item nav-link active"><i class="fas fa-chart-bar me-2"></i>Estadísticas</a>
-  </div>
- </nav></div>
- <div class="content">
-  <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0"><a href="#" class="sidebar-toggler flex-shrink-0"><i class="fa fa-bars"></i></a><span class="ms-3 fw-bold">Centro Municipal de Monitoreo de Riesgo · Durango</span></nav>
-  <div class="container-fluid pt-4 px-4">
-   <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2"><h4 class="mb-0">Estadísticas de servicios de emergencia</h4><button class="btn btn-primary" id="actualizar"><i class="fa fa-rotate me-1"></i>Actualizar</button></div>
-   <div id="estado" class="alert alert-secondary" role="status">Preparando consulta...</div>
-   <div class="row g-3 mb-4">
-    <div class="col-md-3"><label for="anio" class="form-label">Año</label><select id="anio" class="form-select"><option value="">Todos</option></select></div>
-    <div class="col-md-3"><label for="estacion" class="form-label">Estación</label><select id="estacion" class="form-select"><option value="">Todas</option></select></div>
-    <div class="col-md-3"><label for="zona" class="form-label">Zona</label><select id="zona" class="form-select"><option value="">Todas</option></select></div>
-    <div class="col-md-3"><label for="prioridad" class="form-label">Prioridad</label><select id="prioridad" class="form-select"><option value="">Todas</option><option value="uno">Prioridad 1</option><option value="dos">Prioridad 2</option><option value="tres">Prioridad 3</option><option value="rural">Prioridad 1 rural</option></select></div>
-   </div>
-   <div class="row g-3 mb-4">
-    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Total de servicios</div><h3 id="total">—</h3></div></div>
-    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Estaciones con registros</div><h3 id="estaciones">—</h3></div></div>
-    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Zonas con registros</div><h3 id="zonas">—</h3></div></div>
-    <div class="col-md-3 col-6"><div class="bg-secondary rounded p-3"><div class="text-muted">Prioridad 1</div><h3 id="p1">—</h3></div></div>
-   </div>
-   <div class="row g-4 mb-4">
-    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Servicios por estación</h6><div style="height:300px"><canvas id="graficaEstacion"></canvas></div></div></div>
-    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Servicios por mes</h6><div style="height:300px"><canvas id="graficaMes"></canvas></div></div></div>
-    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Servicios por zona</h6><div style="height:300px"><canvas id="graficaZona"></canvas></div></div></div>
-    <div class="col-lg-6"><div class="bg-secondary rounded p-3"><h6>Registros con prioridad informada</h6><div style="height:300px"><canvas id="graficaPrioridad"></canvas></div><small class="text-muted">Las categorías pueden coincidir en un mismo registro; su suma puede superar el total de servicios.</small></div></div>
-   </div>
-  </div>
- </div>
+
+    <!-- ==========================================
+         MENÚ LATERAL
+    ========================================== -->
+
+    <div class="sidebar pe-4 pb-3">
+
+        <nav class="navbar bg-secondary navbar-dark">
+
+            <!-- Logo CMMR -->
+            <a href="index.html"
+               class="navbar-brand mx-4 mb-3">
+
+                <img
+                    src="img/CMMR_logo.png"
+                    alt="CMMR"
+                    class="logo"
+                >
+
+            </a>
+
+            <!-- Opciones del menú -->
+            <div class="navbar-nav w-100">
+
+                <a href="index.html"
+                   class="nav-item nav-link">
+
+                    <i class="fas fa-map-location-dot me-2"></i>
+                    Visor cartográfico
+
+                </a>
+
+                <a href="captura.html"
+                   class="nav-item nav-link">
+
+                    <i class="fas fa-pen-to-square me-2"></i>
+                    Captura de servicios
+
+                </a>
+
+                <a href="estadisticas.html"
+                   class="nav-item nav-link active">
+
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Estadísticas
+
+                </a>
+
+            </div>
+
+        </nav>
+
+    </div>
+
+    <!-- ==========================================
+         CONTENIDO PRINCIPAL
+    ========================================== -->
+
+    <div class="content">
+
+        <!-- Barra superior -->
+        <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+
+            <a href="#"
+               class="sidebar-toggler flex-shrink-0">
+
+                <i class="fa fa-bars"></i>
+
+            </a>
+
+            <span class="ms-3 fw-bold">
+                Centro Municipal de Monitoreo de Riesgo · Durango
+            </span>
+
+        </nav>
+
+        <main class="container-fluid pt-4 px-4">
+
+            <!-- ==================================
+                 TÍTULO Y BOTONES
+            ================================== -->
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+
+                <h4 class="mb-0">
+                    Estadísticas mensuales por tipo de servicio (TS)
+                </h4>
+
+                <div class="d-flex gap-2 no-imprimir">
+
+                    <button
+                        class="btn btn-primary"
+                        id="actualizar"
+                        type="button"
+                    >
+
+                        <i class="fa fa-rotate me-1"></i>
+                        Actualizar
+
+                    </button>
+
+                    <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        onclick="window.print()"
+                    >
+
+                        <i class="fa fa-print me-1"></i>
+                        Imprimir
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- ==================================
+                 FILTROS
+            ================================== -->
+
+            <div class="row g-3 mb-3 no-imprimir">
+
+                <!-- Año -->
+                <div class="col-sm-3">
+
+                    <label class="form-label" for="anio">
+                        Año
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="anio"
+                    ></select>
+
+                </div>
+
+                <!-- Mes -->
+                <div class="col-sm-3">
+
+                    <label class="form-label" for="mes">
+                        Mes
+                    </label>
+
+				<select 
+					class="form-select" id="mes">
+					<option value="acumulado">Acumulado anual</option>
+				</select>
+
+                </div>
+
+                <!-- Estación -->
+                <div class="col-sm-3">
+
+                    <label class="form-label" for="estacion">
+                        Estación
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="estacion"
+                    >
+
+                        <option value="">
+                            Todas las estaciones
+                        </option>
+
+                        <option value="ECO 1">ECO 1</option>
+                        <option value="ECO 2">ECO 2</option>
+                        <option value="ECO 3">ECO 3</option>
+                        <option value="ECO 4">ECO 4</option>
+                        <option value="ECO 5">ECO 5</option>
+
+                    </select>
+
+                </div>
+
+                <!-- Zona -->
+                <div class="col-sm-3">
+
+                    <label class="form-label" for="zona">
+                        Zona
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="zona"
+                    >
+
+                        <option value="">
+                            Todas las zonas
+                        </option>
+
+                        <option value="URBANA">
+                            URBANA
+                        </option>
+
+                        <option value="RURAL">
+                            RURAL
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- ==================================
+                 ESTADO DE CONSULTA
+            ================================== -->
+
+            <div
+                id="estado"
+                class="alert alert-secondary"
+                role="status"
+            >
+                Preparando consulta...
+            </div>
+
+            <!-- ==================================
+                 RESUMEN
+            ================================== -->
+
+            <p class="mb-2">
+
+                <strong id="periodo"></strong>
+
+                ·
+
+                <span id="total">0</span>
+                servicios registrados
+
+                <span id="sinClasificar"></span>
+
+            </p>
+
+            <!-- ==================================
+                 TABLA DE SERVICIOS TS
+            ================================== -->
+
+            <div class="tabla-contenedor">
+
+                <table id="tablaTS">
+
+                    <!-- Encabezados y días -->
+                    <thead id="cabeceraTS"></thead>
+
+                    <!-- Servicios y totales -->
+                    <tbody id="cuerpoTS"></tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Nota -->
+            <p class="text-muted small mt-2">
+
+                Cada columna representa un día del mes.
+                Los totales se calculan por código TS,
+                según el catálogo de Supabase.
+
+                Los días inexistentes se muestran en gris.
+
+            </p>
+
+        </main>
+
+    </div>
+
 </div>
+
+<!-- ==========================================
+     BIBLIOTECAS
+========================================== -->
+
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/estadisticas.js"></script>
+
+<!-- Estadísticas CMMR -->
+<script src="js/estadisticas.js?v=12"></script>
+
+<!-- Plantilla -->
 <script src="js/main.js"></script>
-</body></html>
+
+</body>
+</html>
