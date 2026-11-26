@@ -1,443 +1,360 @@
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMMR - Centro Municipal de Monitoreo de Riesgo en Durango</title>
+    <meta name="keywords" content="CMMR, GEOMFU, SIG, mapas, geomática, Durango, atlas de riesgos">
+    <meta name="description" content="Visor cartográfico del Atlas de Riesgos Municipal - CMMR">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        CMMR - Centro Municipal de Monitoreo de Riesgo en Durango
-    </title>
-
-    <meta name="keywords"
-          content="CMMR, GEOMFU, SIG, mapas, geomática, Durango">
-
-    <meta name="description"
-          content="Visor cartográfico CMMR de servicios de emergencia">
-
-    <!-- FAVICON -->
     <link href="img/favicon.ico" rel="icon">
 
-    <!-- FUENTES -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
+    <!-- FUENTES E ICONOS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
-          rel="stylesheet">
-
-    <!-- ICONOS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-          rel="stylesheet">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
-          rel="stylesheet">
-
-    <!-- BIBLIOTECAS DE PLANTILLA -->
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css"
-          rel="stylesheet">
-
-    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css"
-          rel="stylesheet">
-
-    <!-- BOOTSTRAP -->
-    <link href="css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- ESTILOS CMMR -->
-    <link href="css/style.css"
-          rel="stylesheet">
+    <!-- BOOTSTRAP + ESTILOS CMMR -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 
     <!-- LEAFLET -->
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
+<style>
+/* ===== Jerarquía tipográfica del sidebar =====
+   Nivel 1  Sección (BASE, PELIGROS...)   .70rem  mayúsculas
+   Nivel 2  Grupo / Estadísticas          .95rem  semibold
+   Nivel 3  Capa                          .85rem  normal
+   Nivel 4  Subcapa (Red vial)            .80rem  normal       */
+.sidebar { overflow-y: auto; }
+
+.sidebar .atlas-section {
+    font-family: 'Roboto', sans-serif; font-size: .70rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; line-height: 1;
+    color: #fff; opacity: .6; padding: 1rem 1rem .35rem;
+}
+
+.sidebar .navbar-nav .nav-link {
+    font-family: 'Open Sans', sans-serif; font-size: .95rem; font-weight: 600;
+    line-height: 1.3; white-space: normal;
+}
+.sidebar .atlas-group span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sidebar .navbar-nav .nav-link i { width: 1.25rem; text-align: center; font-size: .95rem; }
+
+.sidebar .atlas-layers .dropdown-item,
+.sidebar .atlas-layers .dropdown-item label {
+    font-family: 'Open Sans', sans-serif; font-size: .85rem; font-weight: 400;
+    line-height: 1.35; white-space: normal;
+}
+.sidebar .atlas-layers .dropdown-item { padding: .3rem .5rem .3rem 1.2rem; }
+
+.sidebar #submenuRedVial .dropdown-item { font-size: .80rem; padding-top: .2rem; padding-bottom: .2rem; }
+
+.sidebar .atlas-layers input { flex-shrink: 0; }
+.sidebar .atlas-layers label:has(input:disabled) { opacity: .5; cursor: default; }
+.sidebar .linea { width: 18px; flex-shrink: 0; }
+</style>
 </head>
 
 <body>
-
 <div class="container-fluid position-relative d-flex p-0">
 
-    <!-- ==========================================
-         SPINNER
-    ========================================== -->
-
-    <div id="spinner"
-         class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-
-        <div class="spinner-border text-primary"
-             style="width:3rem;height:3rem;"
-             role="status">
-
-            <span class="visually-hidden">
-                Cargando...
-            </span>
-
+    <!-- SPINNER -->
+    <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width:3rem;height:3rem;" role="status">
+            <span class="visually-hidden">Cargando...</span>
         </div>
-
     </div>
 
     <!-- ==========================================
          MENÚ LATERAL
     ========================================== -->
-
     <div class="sidebar pe-4 pb-3">
-
         <nav class="navbar bg-secondary navbar-dark">
 
-            <!-- LOGO -->
-            <a href="index.html"
-               class="navbar-brand mx-4 mb-3">
-
-                <img src="img/CMMR_logo.png"
-                     alt="CMMR"
-                     class="logo">
-
+            <a href="index.html" class="navbar-brand mx-4 mb-3">
+                <img src="img/CMMR_logo.png" alt="CMMR" class="logo">
             </a>
 
             <div class="navbar-nav w-100">
 
-                <!-- ======================================
-                     SERVICIOS DE EMERGENCIA
-                ====================================== -->
+<!-- ============ PELIGROS ============ -->
+<div class="atlas-section">Base cartográfica</div>
 
-                <div class="nav-item dropdown">
+<!-- 1. INFORMACIÓN GEOGRÁFICA BÁSICA -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-map me-2"></i><span>Información geográfica básica</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="municipioCheck" onchange="mostrarMunicipio(this.checked)"><span>Límite municipal</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="coloniasCheck" onchange="mostrarColonias(this.checked)"><span>Colonias y fraccionamientos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="ejidosCheck" onchange="mostrarEjidos(this.checked)"><span>Ejidos y comunidades</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="localidadesCheck" onchange="mostrarLocalidades(this.checked)"><span>Localidades</span></label>
 
-                    <a href="#"
-                       class="nav-link dropdown-toggle active d-flex align-items-center"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
+<!-- Red vial (casilla general + subcapas) -->
+<div class="dropdown-item d-flex align-items-center gap-2">
+    <input type="checkbox" id="redVialTodasCheck" onchange="mostrarTodaRedVial(this.checked)">
+    <label for="redVialTodasCheck" class="flex-grow-1 mb-0">Red vial</label>
+    <a href="#submenuRedVial" class="text-reset text-decoration-none" data-bs-toggle="collapse" aria-expanded="false" aria-controls="submenuRedVial"><i class="fas fa-chevron-down"></i></a>
+</div>
+<div class="collapse ps-4" id="submenuRedVial">
+    <label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" class="vial-sub" id="vial_AUTOPISTA" onchange="mostrarRedVial('AUTOPISTA', this.checked)"><span class="linea" style="border-top:3px solid #d32f2f;"></span><span>Autopista</span></label>
+    <label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" class="vial-sub" id="vial_PAVIMENTADA" onchange="mostrarRedVial('PAVIMENTADA', this.checked)"><span class="linea" style="border-top:3px solid #f57c00;"></span><span>Pavimentada</span></label>
+    <label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" class="vial-sub" id="vial_VIALIDAD" onchange="mostrarRedVial('VIALIDAD', this.checked)"><span class="linea" style="border-top:2px solid #616161;"></span><span>Vialidad</span></label>
+    <label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" class="vial-sub" id="vial_TERRACERIA" onchange="mostrarRedVial('TERRACERIA', this.checked)"><span class="linea" style="border-top:2px solid #795548;"></span><span>Terracería</span></label>
+    <label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" class="vial-sub" id="vial_BRECHA" onchange="mostrarRedVial('BRECHA', this.checked)"><span class="linea" style="border-top:2px dashed #a1887f;"></span><span>Brecha</span></label>
+    <label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" class="vial-sub" id="vial_VEREDA" onchange="mostrarRedVial('VEREDA', this.checked)"><span class="linea" style="border-top:2px dotted #388e3c;"></span><span>Vereda</span></label>
+</div>
 
-                        <i class="fas fa-helmet-safety me-2"></i>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="vegetacionCheck" onchange="mostrarVegetacion(this.checked)"><span>Uso de suelo y vegetación</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_hidrografia" disabled><span>Hidrografía (ríos, arroyos y cuerpos de agua)</span></label>
+<div class="dropdown-item d-flex align-items-center gap-2">
+    <a href="#submenuRelieve" class="text-reset text-decoration-none flex-grow-1" data-bs-toggle="collapse" aria-expanded="false" aria-controls="submenuRelieve">Relieve y pendientes <i class="fas fa-chevron-down"></i></a>
+</div>
+<div class="collapse ps-4" id="submenuRelieve">
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="elevacionCheck" onchange="mostrarTopografia('elevacion', this.checked)"><span>Elevación</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="pendienteCheck" onchange="mostrarTopografia('pendiente', this.checked)"><span>Pendiente</span></label>
+</div>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_geologia" disabled><span>Geología</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_presas" disabled><span>Presas y bordos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_ferrocarril" disabled><span>Vías férreas</span></label>
+</div>
+</div>
 
-                        <span>
-                            Servicios<br>
-                            de Emergencia
-                        </span>
+<!-- ============ PELIGROS ============ -->
+<div class="atlas-section">Peligros</div>
 
-                    </a>
+<!-- 2. GEOLÓGICOS -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-mountain me-2"></i><span>Geológicos</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_sismicidad" disabled><span>Sismicidad</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_fallas" disabled><span>Fallas y fracturas</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_hundimientos" disabled><span>Hundimientos y agrietamientos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_laderas" disabled><span>Inestabilidad de laderas</span></label>
+</div>
+</div>
 
-                    <div class="dropdown-menu bg-transparent border-0">
+<!-- 3. HIDROMETEOROLÓGICOS -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-cloud-rain me-2"></i><span>Hidrometeorológicos</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_inundaciones" disabled><span>Inundaciones</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_encharcamientos" disabled><span>Encharcamientos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_sequias" disabled><span>Sequías</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_temperaturas" disabled><span>Temperaturas extremas (heladas y ondas de calor)</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_granizo" disabled><span>Granizadas y nevadas</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_tormentas" disabled><span>Tormentas eléctricas</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_vientos" disabled><span>Vientos fuertes</span></label>
+</div>
+</div>
 
-                        <!-- MAPA DE CALOR -->
-                        <label class="dropdown-item">
+<!-- 4. QUÍMICO-TECNOLÓGICOS -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-fire me-2"></i><span>Químico-tecnológicos</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_incendiosUrbanos" disabled><span>Incendios urbanos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_gasolineras" disabled><span>Gasolineras y gaseras</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_ductos" disabled><span>Ductos de gas</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_industrias" disabled><span>Industrias peligrosas</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_transporteMP" disabled><span>Rutas de materiales peligrosos</span></label>
+</div>
+</div>
 
-                            <input type="checkbox"
-                                   id="heatmap"
-                                   checked
-                                   onchange="mostrarHeatmap(this.checked)">
+<!-- 5. SANITARIO-ECOLÓGICOS -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-leaf me-2"></i><span>Sanitario-ecológicos</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_alacranismo" disabled><span>Alacranismo</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_vectores" disabled><span>Enfermedades por vector (dengue)</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_contaminacion" disabled><span>Contaminación de aire y agua</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_descargas" disabled><span>Descargas de aguas residuales</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_residuos" disabled><span>Residuos peligrosos y tiraderos</span></label>
+</div>
+</div>
 
-                            Mapa de calor
+<!-- 6. SOCIO-ORGANIZATIVOS -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-users me-2"></i><span>Socio-organizativos</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_concentraciones" disabled><span>Concentraciones masivas y eventos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_accidentes" disabled><span>Accidentes viales</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_serviciosVitales" disabled><span>Interrupción de servicios vitales</span></label>
+</div>
+</div>
 
-                        </label>
+<!-- ============ EXPOSICIÓN Y VULNERABILIDAD ============ -->
+<div class="atlas-section">Exposición y vulnerabilidad</div>
 
-                        <div class="dropdown-divider"></div>
+<!-- 7. EXPOSICIÓN -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-building me-2"></i><span>Exposición</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_densidad" disabled><span>Densidad poblacional</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_escuelas" disabled><span>Escuelas</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_guarderias" disabled><span>Guarderías y asilos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_infraCritica" disabled><span>Infraestructura crítica (agua, energía)</span></label>
+</div>
+</div>
 
-                        <!-- ESTACIÓN 1 -->
-                        <label class="dropdown-item">
+<!-- 8. VULNERABILIDAD -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-house me-2"></i><span>Vulnerabilidad</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_marginacion" disabled><span>Índice de marginación</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_viviendas" disabled><span>Viviendas vulnerables</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_grupos" disabled><span>Grupos vulnerables</span></label>
+</div>
+</div>
 
-                            <input type="checkbox"
-                                   name="estaciones"
-                                   value="1"
-                                   onchange="mostrarServicios(this)">
+<!-- ============ RIESGO ============ -->
+<div class="atlas-section">Riesgo</div>
 
-                            Estación 1
+<!-- 9. RIESGO (SÍNTESIS) -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-triangle-exclamation me-2"></i><span>Mapas de riesgo</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_riesgoInundacion" disabled><span>Riesgo por inundación</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_riesgoHundimiento" disabled><span>Riesgo por hundimientos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="areasPrioritariasCheck" onchange="mostrarAreasPrioritarias(this.checked)"><span>Riesgo por incendios de pastizales</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="incendiosForestalesCheck" onchange="mostrarIncendiosForestales(this.checked)"><span>Riesgo por incendios forestales</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_riesgoMulti" disabled><span>Riesgo multiamenaza</span></label>
+</div>
+</div>
 
-                        </label>
+<!-- ============ RESPUESTA ============ -->
+<div class="atlas-section">Respuesta</div>
 
-                        <!-- ESTACIÓN 2 -->
-                        <label class="dropdown-item">
+<!-- 10. INFRAESTRUCTURA DE EMERGENCIA -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-shield-halved me-2"></i><span>Infraestructura de emergencia</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_bomberos" disabled><span>Estaciones de bomberos</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_hospitales" disabled><span>Hospitales y centros de salud</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_pc" disabled><span>Protección civil y Cruz Roja</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_refugios" disabled><span>Refugios temporales</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_hidrantes" disabled><span>Hidrantes</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2" title="Capa pendiente de integrar"><input type="checkbox" id="pend_evacuacion" disabled><span>Rutas de evacuación</span></label>
+</div>
+</div>
 
-                            <input type="checkbox"
-                                   name="estaciones"
-                                   value="2"
-                                   onchange="mostrarServicios(this)">
+<!-- 11. REGISTRO DE EMERGENCIAS CMMR (ids originales sin cambios) -->
+<div class="nav-item dropdown">
+<a href="#" class="nav-link dropdown-toggle d-flex align-items-center atlas-group" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-helmet-safety me-2"></i><span>Registro de emergencias CMMR</span></a>
+<div class="dropdown-menu bg-transparent border-0 atlas-layers">
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="atlas_8_0" name="estaciones" value="1" onchange="mostrarServicios(this)"><span>ECO 1</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="atlas_8_1" name="estaciones" value="2" onchange="mostrarServicios(this)"><span>ECO 2</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="atlas_8_2" name="estaciones" value="3" onchange="mostrarServicios(this)"><span>ECO 3</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="atlas_8_3" name="estaciones" value="4" onchange="mostrarServicios(this)"><span>ECO 4</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="atlas_8_4" name="estaciones" value="5" onchange="mostrarServicios(this)"><span>ECO 5</span></label>
+<label class="dropdown-item d-flex align-items-center gap-2"><input type="checkbox" id="heatmap" checked onchange="mostrarHeatmap(this.checked)"><span>Mapa de calor</span></label>
+</div>
+</div>
 
-                            Estación 2
-
-                        </label>
-
-                        <!-- ESTACIÓN 3 -->
-                        <label class="dropdown-item">
-
-                            <input type="checkbox"
-                                   name="estaciones"
-                                   value="3"
-                                   onchange="mostrarServicios(this)">
-
-                            Estación 3
-
-                        </label>
-
-                        <!-- ESTACIÓN 4 -->
-                        <label class="dropdown-item">
-
-                            <input type="checkbox"
-                                   name="estaciones"
-                                   value="4"
-                                   onchange="mostrarServicios(this)">
-
-                            Estación 4
-
-                        </label>
-
-                        <!-- ESTACIÓN 5 -->
-                        <label class="dropdown-item">
-
-                            <input type="checkbox"
-                                   name="estaciones"
-                                   value="5"
-                                   onchange="mostrarServicios(this)">
-
-                            Estación 5
-
-                        </label>
-
-                    </div>
-
-                </div>
-
-                <!-- ======================================
-                     INFORMACIÓN GEOGRÁFICA
-                ====================================== -->
-
-                <div class="nav-item dropdown">
-
-                    <a href="#"
-                       class="nav-link dropdown-toggle d-flex align-items-center"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
-
-                        <i class="fas fa-map me-2"></i>
-
-                        <span>
-                            Información<br>
-                            Geográfica
-                        </span>
-
-                    </a>
-
-                    
-				<div class="dropdown-menu bg-transparent border-0">
-
-					<!-- COLONIAS Y FRACCIONAMIENTOS -->
-					<label class="dropdown-item d-flex align-items-center gap-2"
-						   for="coloniasCheck">
-
-						<input type="checkbox"
-							   id="coloniasCheck"
-							   onchange="mostrarColonias(this.checked)">
-
-						<span>
-							Colonias y <br>
-							Fraccionamientos
-						</span>
-
-					</label>
-
-					<!-- RIESGO DE INCENDIOS DE PASTIZALES -->
-					<label class="dropdown-item d-flex align-items-center gap-2"
-						   for="areasPrioritariasCheck">
-
-						<input type="checkbox"
-							   id="areasPrioritariasCheck"
-							   onchange="mostrarAreasPrioritarias(this.checked)">
-
-						<span>
-							Riesgo de Incendios <br>
-							de Pastizales
-						</span>
-
-					</label>
-
-				</div>
-
-
-                </div>
-
-                <!-- ======================================
-                     ESTADÍSTICAS
-                ====================================== -->
-
-                <div class="nav-item">
-
-                    <a href="estadisticas.html"
-                       class="nav-link">
-
-                        <i class="fas fa-chart-bar me-2"></i>
-
-                        Estadísticas
-
-                    </a>
-
-                </div>
+<!-- ESTADÍSTICAS -->
+<div class="nav-item">
+    <a href="estadisticas.html" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Estadísticas</a>
+</div>
 
             </div>
-
         </nav>
-
     </div>
 
     <!-- ==========================================
          CONTENIDO PRINCIPAL
     ========================================== -->
-
     <div class="content">
 
-        <!-- BARRA SUPERIOR -->
         <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
-
-            <!-- LOGO MÓVIL -->
-            <a href="index.html"
-               class="navbar-brand d-flex d-lg-none me-4">
-
-                <h2 class="text-primary mb-0">
-                    <i class="fas fa-fire"></i>
-                </h2>
-
+            <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                <h2 class="text-primary mb-0"><i class="fas fa-fire"></i></h2>
             </a>
+            <a href="#" class="sidebar-toggler flex-shrink-0"><i class="fa fa-bars"></i></a>
 
-            <!-- SIDEBAR -->
-            <a href="#"
-               class="sidebar-toggler flex-shrink-0">
-
-                <i class="fa fa-bars"></i>
-
-            </a>
-
-            <!-- COORDENADAS -->
-            <form class="d-none d-md-flex ms-4"
-                  onsubmit="return false;">
-
-                <input class="form-control bg-dark border-0"
-                       type="text"
-                       id="coordenadas"
-                       placeholder="Buscar coordenadas">
-
+            <form class="d-none d-md-flex ms-4" onsubmit="return false;">
+                <input class="form-control bg-dark border-0" type="text" id="coordenadas" placeholder="Buscar coordenadas">
             </form>
 
-            <!-- CONTACTO -->
             <div class="navbar-nav align-items-center ms-auto">
-
                 <div class="nav-item dropdown">
-
-                    <a href="#"
-                       class="nav-link dropdown-toggle"
-                       data-bs-toggle="dropdown">
-
-                        <i class="fas fa-envelope me-2"></i>
-
-                        <span class="d-none d-lg-inline-flex">
-                            Contacto
-                        </span>
-
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-envelope me-2"></i><span class="d-none d-lg-inline-flex">Contacto</span>
                     </a>
-
                     <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
-
-                        <a href="contacto.html"
-                           class="dropdown-item">
-                            Contacto
-                        </a>
-
-                        <a href="acerca.html"
-                           class="dropdown-item">
-                            Acerca de
-                        </a>
-
-                        <a href="ayuda.html"
-                           class="dropdown-item">
-                            Ayuda
-                        </a>
-
+                        <a href="contacto.html" class="dropdown-item">Contacto</a>
+                        <a href="acerca.html" class="dropdown-item">Acerca de</a>
+                        <a href="ayuda.html" class="dropdown-item">Ayuda</a>
                     </div>
-
                 </div>
-
             </div>
-
         </nav>
 
-        <!-- ======================================
-             MAPA LEAFLET
-        ====================================== -->
-
         <div class="container-fluid">
-
             <div class="row mx-0">
-
                 <div id="map"></div>
-
             </div>
-
         </div>
 
     </div>
-
 </div>
 
 <!-- ==========================================
-     DEPENDENCIAS DE PLANTILLA
+     DEPENDENCIAS (solo lo necesario)
 ========================================== -->
-
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="lib/chart/chart.min.js"></script>
-
-<script src="lib/easing/easing.min.js"></script>
-
-<script src="lib/waypoints/waypoints.min.js"></script>
-
-<script src="lib/owlcarousel/owl.carousel.min.js"></script>
-
-<script src="lib/tempusdominus/js/moment.min.js"></script>
-
-<script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-
-<script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-
-<!-- ==========================================
-     LEAFLET
-========================================== -->
-
+<!-- LEAFLET + PLUGINS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- MAPA DE CALOR -->
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-
-<!-- CSV -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-<!-- ==========================================
-     ARCHIVOS DEL VISOR CMMR
-========================================== -->
-
-<!-- MAPA PRINCIPAL -->
-<script src="js/mapa.js"></script>
-
-<!-- COORDENADAS -->
-<script src="js/coordenadas.js"></script>
-
-<!-- SERVICIOS DE EMERGENCIA -->
-<script src="js/servicios.js"></script>
-
+<!-- PENDIENTE: fijar versión de georaster (ej. https://unpkg.com/georaster@X.Y.Z) -->
 <script src="https://unpkg.com/georaster"></script>
 <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 
-<!-- DOS CAPAS GEOJSON EN UN SOLO JS -->
-<script src="js/informacion_geografica2.js"></script>
+<!-- ARCHIVOS DEL VISOR CMMR -->
+<script src="js/mapa.js"></script>
+<script src="js/coordenadas.js"></script>
+<script src="js/servicios.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+<script src="https://unpkg.com/pmtiles@3.2.0/dist/pmtiles.js"></script>
+<script src="js/informacion_geografica.js?v=21"></script>
+<script src="js/quimico_tecnologicos.js?v=21"></script>
 
-<!-- PLANTILLA -->
-<script src="js/main.js"></script>
+<!-- ==========================================
+     FUNCIONES BÁSICAS DE LA INTERFAZ
+     (reemplazan a main.js de la plantilla)
+========================================== -->
+<script>
+// Ocultar spinner al cargar
+window.addEventListener('load', function () {
+    document.getElementById('spinner').classList.remove('show');
+});
+
+// Mostrar / ocultar menú lateral
+document.querySelector('.sidebar-toggler').addEventListener('click', function (e) {
+    e.preventDefault();
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.querySelector('.content').classList.toggle('open');
+});
+
+// Red vial: la casilla general refleja el estado de las subcapas
+(function () {
+    var general = document.getElementById('redVialTodasCheck');
+    var subs = document.querySelectorAll('.vial-sub');
+    function actualizar() {
+        var marcadas = Array.prototype.filter.call(subs, function (c) { return c.checked; }).length;
+        general.checked = marcadas === subs.length;
+        general.indeterminate = marcadas > 0 && marcadas < subs.length;
+    }
+    subs.forEach(function (c) { c.addEventListener('change', actualizar); });
+    general.addEventListener('change', function () {
+        subs.forEach(function (c) { c.checked = general.checked; });
+        general.indeterminate = false;
+    });
+})();
+</script>
 
 </body>
 </html>
